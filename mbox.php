@@ -513,78 +513,47 @@ class Mail_Mbox extends PEAR
     function _process($resourceId)
     {
         // sanity check
-        if (!is_resource($this->_resources[$resourceId]["fresource"])) {
+        if (!is_resource($this->_resources[$resourceId]['fresource'])) {
             return PEAR::raiseError("Resource isn't valid.");
         }
 
         // going to start
-        if (@fseek($this->_resources[$resourceId]["fresource"], 0) == -1) {
+        if (@fseek($this->_resources[$resourceId]['fresource']) == -1) {
             return PEAR::raiseError("Cannot read mbox");
         }
 
-        // starting values
-        $bytes = 0;
-        $bytesEnd = 0;
-        $lines = 0;
+        // current start byte position
+        $start      = 0;
+        // last start byte position
+        $laststart  = 0;
+        // there aren't any message
+        $hasmessage = false;
 
-        $lineThis = '';
-        unset($lineLast);
+        while ($line = fgets($this->_resources[$resourceId]['fresource'], 4096)) {
+            // if line start with "From ", it is a new message
+            if (0 === strncmp($line, 'From ', 5)) {
+                // save last start byte position
+                $laststart  = $start;
+        
+                // new start byte position is the start of the line 
+                $start      = ftell($this->_resources[$resourceId]['fresource']) - strlen($line);
 
-        while (feof($this->_resources[$resourceId]["fresource"]) != true) {
-            // getting char by char
-            $c = fgetc($this->_resources[$resourceId]["fresource"]);
-            $lineThis .= $c;
-            // each \n we will check things 
-            if ($c === "\n") {
-                // checking if start with From
-                if (substr($lineThis, 0, 5) === "From ") {
-                    // this line byte count is last line more 1 byte
-                    $bytesStart = $bytesEnd + 1;
-                    // last line byte count is this line bytes minus this line length
-                    $bytesEnd = $bytes - strlen($lineThis);
-                    // we will check messages after they end
-                    if ($bytesStart != 1) {
-                        if ($this->debug) {
-                            printf("#################### from byte %08d to byte %08d ################### <br />", $bytesStart, $bytesEnd);
-                        }
-
-                        // setting new message points
-                        $messagesCount = $this->size($resourceId);
-                        $this->_resources[$resourceId]["messages"][$messagesCount][0] = $bytesStart;
-                        $this->_resources[$resourceId]["messages"][$messagesCount][1] = $bytesEnd;
-                    }
-                }
-
-                // increasing number of lines (doesn't matter)
-                if ($this->debug) {
-                    $lines++;
-                }
- 
-                // last line is this line
-                $lineLast = $lineThis;
-
-                // this line is blank now
-                $lineThis = '';
-                if ($this->debug) {
-                    printf("%08d:%08d %s<br/>", $lines, $bytes, $lineLast);
+                // if it is not the first message add message positions
+                if ($start > 0) {
+                    $this->_resources[$resourceId]["messages"][] = array($laststart, $start - 1);
+                } else {
+                    // tell that there is really a message on the file
+                    $hasmessage = true;
                 }
             }
-            $bytes++;
         }
-        // last message must be made here - again same things - 
 
-        // this line byte count is last line more 1 byte
-        $bytesStart = $bytesEnd + 1;
-        // last line byte count is this line bytes minus this line length
-        $bytesEnd = $bytes - strlen($lineThis) - 2;
-        // we will check messages after they end
-
-        if ($bytesEnd > 0) {
-            $messagesCount = $this->size($resourceId);
-            $this->_resources[$resourceId]["messages"][$messagesCount][0] = $bytesStart;
-            $this->_resources[$resourceId]["messages"][$messagesCount][1] = $bytesEnd;
+        // if there are just one message, or if it's the last one,
+        // add it to messages positions
+        if (($start == 0 && $hasmessage === true) || $start > 0) {
+            $this->_resources[$resourceId]["messages"][] = array($start, ftell($this->_resources[$resourceId]['fresource']));
         }
-    }    
+    }
 }
   
 ?>
