@@ -12,16 +12,27 @@
     </maintainer>
   </maintainers>
   <release>
-    <version>0.1.4</version>
-    <date>2002-12-28</date>
-    <license>PHP</license>
+    <version>0.1.5</version>
+    <date>2002-12-29</date>
+    <license>LGPL</license>
     <state>alpha</state>
-    <notes>o Joined mbox_test.php and mbox.php</notes>
+    <notes>o Security fix (changed umask on temp files)
+o Improved stylistcs with new Jon Parise patch
+o Fixed error on license at project.xml (it isnt really PHP license, it is LGPL)</notes>
     <filelist>
-      <file role="php" baseinstalldir="Mail" md5sum="dffb82bcc775fa94f8b4bf7a9bfab5dc" name="mbox.php"/>
+      <file role="php" baseinstalldir="Mail" md5sum="1b61c6f960c5e616ba11d61bcdabfd77" name="mbox.php"/>
     </filelist>
   </release>
   <changelog>
+    <release>
+      <version>0.1.5</version>
+      <date>2002-12-29</date>
+      <state>alpha</state>
+      <notes>o Security fix (changed umask on temp files)
+o Improved stylistcs with new Jon Parise patch
+o Fixed error on license at project.xml (it isnt really PHP license, it is LGPL)
+</notes>
+    </release>
     <release>
       <version>0.1.4</version>
       <date>2002-12-28</date>

@@ -180,7 +180,7 @@ class Mail_Mbox extends PEAR
     * @var      bool
     * @access   public
     */
-    var $debug        = false;
+    var $debug = false;
 
     /**
       * Open a Mbox
@@ -200,22 +200,22 @@ class Mail_Mbox extends PEAR
         if (!file_exists($file)) {
             return PEAR::raiseError("Cannot open the mbox file: file doesnt exists.");
         }
-        
-        // getting next resource it to set
-        $resourceId                                        = sizeof($this->_resources) + 1;
-            
-        // setting filename to the resource id
-        $this->_resources[$resourceId]["filename"]        = $file;
 
-        // oppening the file
-        $this->_resources[$resourceId]["fresource"]        = fopen($file, "r");
+        // getting next resource it to set
+        $resourceId = sizeof($this->_resources) + 1;
+
+        // setting filename to the resource id
+        $this->_resources[$resourceId]["filename"] = $file;
+
+        // opening the file
+        $this->_resources[$resourceId]["fresource"] = fopen($file, "r");
         if (!is_resource($this->_resources[$resourceId]["fresource"])) {
             return PEAR::raiseError("Cannot open the mbox file: maybe without permission.");
         }
-        // process the file and get the messages bytes offsets
 
+        // process the file and get the messages bytes offsets
         $this->_process($resourceId);
-    
+
         return $resourceId;
     }
 
@@ -233,12 +233,12 @@ class Mail_Mbox extends PEAR
         if (!is_resource($this->_resources[$resourceId]["fresource"])) {
             return PEAR::raiseError("Cannot close the mbox file because it wanst open.");
         }
-        
-        if (fclose($this->_resources[$resourceId]["fresource"]) == true) {
-            return true;
-        } else {
+
+        if (!fclose($this->_resources[$resourceId]["fresource"])) {
             return PEAR::raiseError("Cannot close the mbox, maybe file is being used (?)");
         }
+
+        return true;
     }
 
     /**
@@ -247,7 +247,8 @@ class Mail_Mbox extends PEAR
     * Get Mbox Number of Messages
     *
     * @param    int $resourceId     Mbox resouce id created by open
-    * @return   int                 Number of messages on Mbox (starting on 1, 0 if no message exists)
+    * @return   int                 Number of messages on Mbox (starting on 1,
+    *                               0 if no message exists)
     * @access   public
     */
     function size($resourceId)
@@ -273,24 +274,26 @@ class Mail_Mbox extends PEAR
         if (!is_array($this->_resources[$resourceId]["messages"][$message])) {
             return PEAR::raiseError("Message doesnt exists.");
         }
-        
+
         // getting bytes locations
-        $bytesStart        = $this->_resources[$resourceId]["messages"][$message][0];
-        $bytesEnd        = $this->_resources[$resourceId]["messages"][$message][1];
-        
+        $bytesStart = $this->_resources[$resourceId]["messages"][$message][0];
+        $bytesEnd = $this->_resources[$resourceId]["messages"][$message][1];
+
         // a debug feature to show the bytes locations
-        if ($this->debug == true) {
+        if ($this->debug) {
             printf("%08d=%08d<br />", $bytesStart, $bytesEnd);
         }
-    
+
         // seek to start of message
         if (@fseek($this->_resources[$resourceId]["fresource"], $bytesStart) == -1) {
             return PEAR::raiseError("Cannot read message bytes");
         }
-        
+
         if ($bytesEnd - $bytesStart > 0) {
             // reading and returning message (bytes to read = difference of bytes locations)
-            return fread($this->_resources[$resourceId]["fresource"], $bytesEnd - $bytesStart) . "\n";
+            $msg = fread($this->_resources[$resourceId]["fresource"],
+                         $bytesEnd - $bytesStart) . "\n";
+            return $msg;
         }
     }
 
@@ -313,22 +316,27 @@ class Mail_Mbox extends PEAR
             return PEAR::raiseError("Message doesnt exists.");
         }
 
+        // changing umask for security reasons
+        $umaskOld   = umask(077);
         // creating temp file
-        $ftempname    = tempnam ("/tmp", rand(0, 9));
-        $ftemp        = fopen($ftempname, "w");
+        $ftempname  = tempnam ("/tmp", rand(0, 9));
+        // returning to old umask
+        umask($umaskOld);
+
+        $ftemp      = fopen($ftempname, "w");
         if ($ftemp == false) {
             return PEAR::raiseError("Cannot create a temp file. Cannot handle this error.");            
         }
-       
+
         // writting only undeleted messages 
         $messages = $this->size($resourceId);
-    
-        for ($x = 0; $x < $messages; $x++)    {
+
+        for ($x = 0; $x < $messages; $x++) {
             if ($x == $message) {
                 continue;    
             }
 
-            $messageThis        = $this->get($resourceId, $x);
+            $messageThis = $this->get($resourceId, $x);
             if (is_string($messageThis)) {
                 fwrite($ftemp, $messageThis, strlen($messageThis));
             }
@@ -345,7 +353,7 @@ class Mail_Mbox extends PEAR
     /**
     * Update a message
     *
-    * Note: PEAR::Mail_Mbox auto adds \n\n at end of the message
+    * Note: Mail_Mbox auto adds \n\n at end of the message
     *
     * Note: messages start with 0.
     *
@@ -364,7 +372,7 @@ class Mail_Mbox extends PEAR
 
         // creating temp file
         $ftempname  = tempnam ("/tmp", rand(0, 9));
-        $ftemp      = fopen($ftempname, "w");
+        $ftemp = fopen($ftempname, "w");
         if ($ftemp == false) {
             return PEAR::raiseError("Cannot create a temp file. Cannot handle this error.");
         }
@@ -372,11 +380,11 @@ class Mail_Mbox extends PEAR
         // writting only undeleted messages
         $messages = $this->size($resourceId);
 
-        for ($x = 0; $x < $messages; $x++)  {
+        for ($x = 0; $x < $messages; $x++) {
             if ($x == $message) {
-                $messageThis        = $content . "\n\n";
+                $messageThis = $content . "\n\n";
             } else {
-                $messageThis        = $this->get($resourceId, $x);
+                $messageThis = $this->get($resourceId, $x);
             }
 
             if (is_string($messageThis)) {
@@ -411,14 +419,13 @@ class Mail_Mbox extends PEAR
     function insert($resourceId, $content, $offset = NULL)
     {
         // checking if we have bytes locations for this message
-
         if (!is_array($this->_resources[$resourceId])) {
             return PEAR::raiseError("ResourceId doesnt exists.");
         }
 
         // creating temp file
         $ftempname  = tempnam ("/tmp", rand(0, 9));
-        $ftemp      = fopen($ftempname, "w");
+        $ftemp = fopen($ftempname, "w");
         if ($ftemp == false) {
             return PEAR::raiseError("Cannot create a temp file. Cannot handle this error.");
         }
@@ -434,15 +441,15 @@ class Mail_Mbox extends PEAR
                 if ($offset !== NULL && $x == $offset) {
                     fwrite($ftemp, $content, strlen($content));
                 }
-                $messageThis        = $this->get($resourceId, $x);
+                $messageThis = $this->get($resourceId, $x);
     
                 if (is_string($messageThis)) {
                     fwrite($ftemp, $messageThis, strlen($messageThis));
                 }
             }
         }
-        if ($offset === NULL)
-        {
+
+        if ($offset === NULL) {
             fwrite($ftemp, $content, strlen($content));
         }
 
@@ -453,8 +460,6 @@ class Mail_Mbox extends PEAR
 
         return $this->_move($resourceId, $ftempname, $filename);
     }
-
-
 
     /**
     * Copy a file to another
@@ -469,7 +474,7 @@ class Mail_Mbox extends PEAR
     function _move($resourceId, $ftempname, $filename) 
     {
         // opening ftemp to read
-        $ftemp      = fopen($ftempname, "r");
+        $ftemp = fopen($ftempname, "r");
 
         if ($ftemp == false) {
             return PEAR::raiseError("Cannot open temp file.");
@@ -481,23 +486,22 @@ class Mail_Mbox extends PEAR
             return PEAR::raiseError("Cannot write on mbox file.");
         }
 
-        while (feof($ftemp) != true)
-        {
+        while (feof($ftemp) != true) {
             $strings = fread($ftemp, 4096);
             if (!fwrite($fp, $strings, strlen($strings))) {
                 return PEAR::raiseError("Cannot write to file.");
             }
         }
+
         fclose($fp);
-                            
         fclose($ftemp);
-            
         unlink($ftempname);
-        
+
         // open another resource and substitute it to the old one
         $mid = $this->open($filename);
         $this->_resources[$resourceId] = $this->_resources[$mid];
         unset($this->_resources[$mid]);
+
         return true;
     }
 
@@ -514,7 +518,6 @@ class Mail_Mbox extends PEAR
     function _process($resourceId)
     {
         // sanit check
-
         if (!is_resource($this->_resources[$resourceId]["fresource"])) {
             return PEAR::raiseError("Resource isn't valid.");
         }
@@ -525,49 +528,48 @@ class Mail_Mbox extends PEAR
         }
 
         // starting values
-        $bytes            = 0;
+        $bytes = 0;
+        $lines = 0;
+
         unset($lineThis);
         unset($lineLast);
-        $lines            = 0;
 
         while (feof($this->_resources[$resourceId]["fresource"]) != true) {
             // getting char by char
-            $c            = fgetc($this->_resources[$resourceId]["fresource"]);
-            $lineThis    .= $c;
+            $c = fgetc($this->_resources[$resourceId]["fresource"]);
+            $lineThis .= $c;
             // each \n we will check things 
             if ($c === "\n") {
                 // checking if start with From
                 if (substr($lineThis, 0, 5) === "From ") {
                     // this line byte count is last line more 1 byte
-                    $bytesStart    = $bytesEnd + 1;
+                    $bytesStart = $bytesEnd + 1;
                     // last line byte count is this line bytes minus this line length
                     $bytesEnd = $bytes - strlen($lineThis);
                     // we will check messages after they end
                     if ($bytesStart != 1) {
-                                if ($this->debug == true) {
-                                    printf("#################### from byte %08d to byte %08d ################### <br />", $bytesStart, $bytesEnd);
-                                }
-                                // setting new message points
-                                $messagesCount                                                    = $this->size($resourceId);
-                                $this->_resources[$resourceId]["messages"][$messagesCount][0]    = $bytesStart;
-                                $this->_resources[$resourceId]["messages"][$messagesCount][1]    = $bytesEnd;
-                            }
-                            
+                        if ($this->debug) {
+                            printf("#################### from byte %08d to byte %08d ################### <br />", $bytesStart, $bytesEnd);
+                        }
+
+                        // setting new message points
+                        $messagesCount = $this->size($resourceId);
+                        $this->_resources[$resourceId]["messages"][$messagesCount][0] = $bytesStart;
+                        $this->_resources[$resourceId]["messages"][$messagesCount][1] = $bytesEnd;
                     }
+                }
 
-
-
-                // increasing number of lines (doesnt matter)
-                if ($this->debug == true) {
+                // increasing number of lines (doesn't matter)
+                if ($this->debug) {
                     $lines++;
                 }
-    
+ 
                 // last line is this line
-                $lineLast        = $lineThis;
+                $lineLast = $lineThis;
 
                 // this line is blank now
                 unset($lineThis);
-                if ($this->debug == true) {
+                if ($this->debug) {
                     printf("%08d:%08d %s<br/>", $lines, $bytes, $lineLast);
                 }
             }
@@ -580,11 +582,10 @@ class Mail_Mbox extends PEAR
         // last line byte count is this line bytes minus this line length
         $bytesEnd = $bytes - strlen($lineThis) - 2;
         // we will check messages after they end
-        
-        $messagesCount                                                  = $this->size($resourceId);
-        $this->_resources[$resourceId]["messages"][$messagesCount][0]   = $bytesStart;
-        $this->_resources[$resourceId]["messages"][$messagesCount][1]   = $bytesEnd;
-    
+
+        $messagesCount = $this->size($resourceId);
+        $this->_resources[$resourceId]["messages"][$messagesCount][0] = $bytesStart;
+        $this->_resources[$resourceId]["messages"][$messagesCount][1] = $bytesEnd;
     }    
 }
   
