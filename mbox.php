@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2002 The PHP Group                                |
+// | Copyright (c) 1997-2003 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -24,7 +24,7 @@ require_once "PEAR.php";
     * Mbox PHP class to Unix MBOX parsing and using
     * 
     * LICENSE (LGPL)
-    * Copyright (C) 2002-2003 Roberto Berto
+    * Copyright (c) 2002-2003-2003 Roberto Berto
     * This library is free software; you can redistribute it and/or
     * modify it under the terms of the GNU Lesser General Public
     * License as published by the Free Software Foundation; either
