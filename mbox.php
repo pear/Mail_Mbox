@@ -21,127 +21,128 @@
 require_once "PEAR.php";
 
     /**
-    * Mbox PHP class to Unix MBOX parsing and using
-    * 
-    * 
-    * METHODS:
-    * int resource mbox->open(string file)
-    *   open a mbox and return a resource id
-    *
-    * bool mbox->close(resource)
-    *   close a mbox resource id
-    *
-    * int mbox->size(resource)
-    *   return mbox number of messages
-    *
-    * string mbox->get(int resource, messageNumber)
-    *   return the message number of the resource
-    *
-    * bool mbox->update(int resource, int messageNumber, string message)
-    *   update the message offset to message (need write permission)
-    *
-    * bool mbox->remove(int resource, int messageNumber)
-    *   remove the message messageNumber (need write permission)
-    *
-    * bool mbox->insert(int resource, string message[, $offset = null])
-    *   add message to the end of the mbox. Offset == 0 message will
-    *   be append at first message. If after == null will be the last
-    *   one message. (need write permission)
-    *
-    * RELATED LINKS: 
-    * - CPAN Perl Mail::Folder::Mbox Module
-    *   Used as a start point to create this class.
-    *   http://search.cpan.org/author/KJOHNSON/MailFolder-0.07/Mail/Folder/Mbox.pm
-    *
-    * - PHP Mime Decode PEAR Module 
-    *   Use it to parse headers and body.
-    *   http://pear.php.net/package-info.php?pacid=21
-    *
-    * EXAMPLE: 
-    // some random content
-    $content = <<<EOF
-From Foo@example.com Fri Dec 27 14:31:10 2002
-Return-Path: 
-Received: from [unix socket] by campos.example.com (LMTP); Fri, 27 Dec
-    2002 14:31:10 -0200 (BRST)
-Date: Fri, 27 Dec 2002 14:31:21 -0500
-Message-Id: <200212271931.gBRJVL012289@example.com>
-Received: from  pcp128525pcs.foo.example.com (
-    pcp128525pcs.example.com [99.99.99.99]) by/
-    serjolen6com.example.com (v64.19) with ESMTP id
-    MAILRELAYINZA98-3601058302; Fri, 08 Nov 2002 06:39:05 -0500
-From: "Foo@example.com"
-To: fool@example.com
-Subject: This is A SPAM!!
-Content-Type: text/plan
+     * Mbox PHP class to Unix MBOX parsing and using
+     * 
+     * 
+     * METHODS:
+     * int resource mbox->open(string file)
+     *   open a mbox and return a resource id
+     *
+     * bool mbox->close(resource)
+     *   close a mbox resource id
+     *
+     * int mbox->size(resource)
+     *   return mbox number of messages
+     *
+     * string mbox->get(int resource, messageNumber)
+     *   return the message number of the resource
+     *
+     * bool mbox->update(int resource, int messageNumber, string message)
+     *   update the message offset to message (need write permission)
+     *
+     * bool mbox->remove(int resource, int messageNumber)
+     *   remove the message messageNumber (need write permission)
+     *
+     * bool mbox->insert(int resource, string message[, $offset = null])
+     *   add message to the end of the mbox. Offset == 0 message will
+     *   be append at first message. If after == null will be the last
+     *   one message. (need write permission)
+     *
+     * RELATED LINKS: 
+     * - CPAN Perl Mail::Folder::Mbox Module
+     *   Used as a start point to create this class.
+     *   http://search.cpan.org/author/KJOHNSON/MailFolder-0.07/Mail/Folder/Mbox.pm
+     *
+     * - PHP Mime Decode PEAR Module 
+     *   Use it to parse headers and body.
+     *   http://pear.php.net/package-info.php?pacid=21
+     *
+     * EXAMPLE: 
+     *    // some random content
+     *    $content = <<<EOF
+     *From Foo@example.com Fri Dec 27 14:31:10 2002
+     *Return-Path: 
+     *Received: from [unix socket] by campos.example.com (LMTP); Fri, 27 Dec
+     *    2002 14:31:10 -0200 (BRST)
+     *Date: Fri, 27 Dec 2002 14:31:21 -0500
+     *Message-Id: <200212271931.gBRJVL012289@example.com>
+     *Received: from  pcp128525pcs.foo.example.com (
+     *    pcp128525pcs.example.com [99.99.99.99]) by/
+     *    serjolen6com.example.com (v64.19) with ESMTP id
+     *    MAILRELAYINZA98-3601058302; Fri, 08 Nov 2002 06:39:05 -0500
+     *From: "Foo@example.com"
+     *To: fool@example.com
+     *Subject: This is A SPAM!!
+     *Content-Type: text/plan
+     *
+     *testing foo spam
+     *EOF;
+     *
+     *    // starting mbox
+     *    require_once "mbox.php";
+     *    $mbox    =      new Mail_Mbox();
+     *
+     *    // uncomment to see lots of things
+     *    #$mbox->debug    = true;
+     *
+     *    // opennign file mbox
+     *    $mid     =     $mbox->open("mbox");
+     *
+     *    // uncomment to see internal vars
+     *    #print_r($mbox);
+     *
+     *
+     *
+     *    // deleting a message (uncomment to test)
+     *    #$res1 =  $mbox->remove($mid,0);
+     *    if (PEAR::isError($res1))
+     *    {
+     *        print $res1->getMessage();
+     *    }
+     *
+     *
+     *
+     *
+     *
+     *        // changing a message (uncomment to test)
+     *    #$res2 = $mbox->update($mid,0,$content);
+     *        if (PEAR::isError($res2))
+     *        {
+     *                print $res2->getMessage();
+     *        }
+     *
+     *
+     *        // adding a message (uncomment to test)
+     *        $res3 = $mbox->insert($mid,$content,0);
+     *        if (PEAR::isError($res3))
+     *        {
+     *                print $res3->getMessage();
+     *        }
+     *
+     *
+     *
+     *    require_once "Mail/mimeDecode.php";
+     *    // showing current messages with Mail Mime
+     *    for ($x = 0; $x < $mbox->size($mid); $x++)
+     *    {
+     *        printf("Message: %08d<pre>",$x);
+     *        $thisMessage     = $mbox->get($mid,$x);
+     *        print $thisMessage;    
+     *        print "<hr />";
+     *        $decode = new Mail_mimeDecode($thisMessage, "\r\n");
+     *        $structure = $decode->decode();
+     *        print_r($structure);
+     *
+     *        print "</pre><hr /><hr /><hr />";
+     *    }
+     *
+     *
+     *
+     * @author   Roberto Berto <darkelder@php.net>
+     * @package  Mail
+     * @access   public
+     */
 
-testing foo spam
-EOF;
-
-    // starting mbox
-    require_once "mbox.php";
-    $mbox    =      new Mail_Mbox();
-
-    // uncomment to see lots of things
-    #$mbox->debug    = true;
-
-    // opennign file mbox
-    $mid     =     $mbox->open("mbox");
-
-    // uncomment to see internal vars
-    #print_r($mbox);
-
-
-
-    // deleting a message (uncomment to test)
-    #$res1 =  $mbox->remove($mid,0);
-    if (PEAR::isError($res1))
-    {
-        print $res1->getMessage();
-    }
-
-
-
-
-
-        // changing a message (uncomment to test)
-    #$res2 = $mbox->update($mid,0,$content);
-        if (PEAR::isError($res2))
-        {
-                print $res2->getMessage();
-        }
-
-
-        // adding a message (uncomment to test)
-        $res3 = $mbox->insert($mid,$content,0);
-        if (PEAR::isError($res3))
-        {
-                print $res3->getMessage();
-        }
-
-
-
-    require_once "Mail/mimeDecode.php";
-    // showing current messages with Mail Mime
-    for ($x = 0; $x < $mbox->size($mid); $x++)
-    {
-        printf("Message: %08d<pre>",$x);
-        $thisMessage     = $mbox->get($mid,$x);
-        print $thisMessage;    
-        print "<hr />";
-        $decode = new Mail_mimeDecode($thisMessage, "\r\n");
-        $structure = $decode->decode();
-        print_r($structure);
-
-        print "</pre><hr /><hr /><hr />";
-    }
-    *
-    *
-    *
-    * @author   Roberto Berto <darkelder@php.net>
-    * @package  Mail
-    * @access   public
-    */
 class Mail_Mbox extends PEAR
 {
     /**
@@ -156,27 +157,27 @@ class Mail_Mbox extends PEAR
     var $_resources;
 
     /**
-    * Debug mode 
-    *
-    * Set to true to turn on debug mode
-    *
-    * @var      bool
-    * @access   public
-    */
-    var $debug = false;
+     * Debug mode 
+     *
+     * Set to true to turn on debug mode
+     *
+     * @var      bool
+     * @access   public
+     */
+     var $debug = false;
 
     /**
-      * Open a Mbox
-      *
-      * Open the Mbox file and return an resource identificator.
-      *
-      * Also, this function will process the Mbox and create a cache 
-      * that tells each message start and end bytes.
-      * 
-      * @param  int $file   Mbox file to open
-      * @return mixed       ResourceID on success else pear error class
-      * @access public
-      */
+     * Open a Mbox
+     *
+     * Open the Mbox file and return an resource identificator.
+     *
+     * Also, this function will process the Mbox and create a cache 
+     * that tells each message start and end bytes.
+     * 
+     * @param  int $file   Mbox file to open
+     * @return mixed       ResourceID on success else pear error class
+     * @access public
+     */
     function open($file)
     {
         // check if file exists else return pear error
@@ -203,14 +204,14 @@ class Mail_Mbox extends PEAR
     }
 
     /**
-    * Close a Mbox
-    *
-    * Close the Mbox file opened by open()
-    *
-    * @param    int $resourceId     Mbox resouce id created by open
-    * @return   mixed               true on success else pear error class
-    * @access   public
-    */
+     * Close a Mbox
+     *
+     * Close the Mbox file opened by open()
+     *
+     * @param    int $resourceId     Mbox resouce id created by open
+     * @return   mixed               true on success else pear error class
+     * @access   public
+     */
     function close($resourceId)
     {
         if (!is_resource($this->_resources[$resourceId]["fresource"])) {
@@ -225,15 +226,15 @@ class Mail_Mbox extends PEAR
     }
 
     /**
-    * Mbox Size
-    * 
-    * Get Mbox Number of Messages
-    *
-    * @param    int $resourceId     Mbox resouce id created by open
-    * @return   int                 Number of messages on Mbox (starting on 1,
-    *                               0 if no message exists)
-    * @access   public
-    */
+     * Mbox Size
+     * 
+     * Get Mbox Number of Messages
+     *
+     * @param    int $resourceId     Mbox resouce id created by open
+     * @return   int                 Number of messages on Mbox (starting on 1,
+     *                               0 if no message exists)
+     * @access   public
+     */
     function size($resourceId)
     {
         if (array_key_exists('messages', $this->_resources[$resourceId])) {
@@ -244,17 +245,17 @@ class Mail_Mbox extends PEAR
     }    
 
     /**
-    * Mbox Get 
-    *
-    * Get a Message from Mbox
-    *
-    * Note: Message number start from 0.
-    *
-    * @param    int $resourceId     Mbox resouce id created by open
-    * @param    int $message        The number of Message
-    * @return   string              Return the message else pear error class
-    * @access   public
-    */
+     * Mbox Get 
+     *
+     * Get a Message from Mbox
+     *
+     * Note: Message number start from 0.
+     *
+     * @param    int $resourceId     Mbox resouce id created by open
+     * @param    int $message        The number of Message
+     * @return   string              Return the message else pear error class
+     * @access   public
+     */
     function get($resourceId, $message)
     {
         // checking if we have bytes locations for this message
@@ -285,18 +286,18 @@ class Mail_Mbox extends PEAR
     }
 
     /**
-    * Delete Message
-    *
-    * Remove a message from Mbox and save it.
-    *
-    * Note: messages start with 0.
-    *
-    * @param    int $resourceId     Mbox resouce id created by open
-    * @param    int $message        The number of Message to remove, or
-    *                               array of message ids to remove
-    * @return   mixed               Return true else pear error class
-    * @access   public
-    */
+     * Delete Message
+     *
+     * Remove a message from Mbox and save it.
+     *
+     * Note: messages start with 0.
+     *
+     * @param    int $resourceId     Mbox resouce id created by open
+     * @param    int $message        The number of Message to remove, or
+     *                               array of message ids to remove
+     * @return   mixed               Return true else pear error class
+     * @access   public
+     */
     function remove($resourceId, $message)
     {
         // convert single message to array
@@ -346,18 +347,18 @@ class Mail_Mbox extends PEAR
     }
 
     /**
-    * Update a message
-    *
-    * Note: Mail_Mbox auto adds \n\n at end of the message
-    *
-    * Note: messages start with 0.
-    *
-    * @param    int $resourceId     Mbox resouce id created by open
-    * @param    int $message        The number of Message to updated
-    * @param    string $content     The new content of the Message
-    * @return   mixed               Return true else pear error class
-    * @access   public
-    */
+     * Update a message
+     *
+     * Note: Mail_Mbox auto adds \n\n at end of the message
+     *
+     * Note: messages start with 0.
+     *
+     * @param    int $resourceId     Mbox resouce id created by open
+     * @param    int $message        The number of Message to updated
+     * @param    string $content     The new content of the Message
+     * @return   mixed               Return true else pear error class
+     * @access   public
+     */
     function update($resourceId, $message, $content)
     {
         // checking if we have bytes locations for this message
@@ -396,21 +397,21 @@ class Mail_Mbox extends PEAR
     }
 
     /**
-    * Insert a message
-    *
-    * PEAR::Mail_Mbox will insert the message according its offset. 
-    * 0 means before the actual message 0. 3 means before the message 3
-    * (Remember: message 3 is the forth message). The default is put 
-    * AFTER the last message.
-    *
-    * Note: PEAR::Mail_Mbox auto adds \n\n at end of the message
-    *
-    * @param    int $resourceId     Mbox resouce id created by open
-    * @param    string $content     The content of the new Message
-    * @param    int offset          Before the offset. Default: last message
-    * @return   mixed               Return true else pear error class
-    * @access   public
-    */
+     * Insert a message
+     *
+     * PEAR::Mail_Mbox will insert the message according its offset. 
+     * 0 means before the actual message 0. 3 means before the message 3
+     * (Remember: message 3 is the forth message). The default is put 
+     * AFTER the last message.
+     *
+     * Note: PEAR::Mail_Mbox auto adds \n\n at end of the message
+     *
+     * @param    int $resourceId     Mbox resouce id created by open
+     * @param    string $content     The content of the new Message
+     * @param    int offset          Before the offset. Default: last message
+     * @return   mixed               Return true else pear error class
+     * @access   public
+     */
     function insert($resourceId, $content, $offset = NULL)
     {
         // checking if we have bytes locations for this message
@@ -457,15 +458,15 @@ class Mail_Mbox extends PEAR
     }
 
     /**
-    * Copy a file to another
-    *
-    * Used internally to copy the content of the temp file to the mbox file
-    *
-    * @parm     int $resourceId     Resource file
-    * @parm     string $ftempname   Source file - will be removed
-    * @param    string $filename    Output file
-    * @access   private
-    */
+     * Copy a file to another
+     *
+     * Used internally to copy the content of the temp file to the mbox file
+     *
+     * @parm     int $resourceId     Resource file
+     * @parm     string $ftempname   Source file - will be removed
+     * @param    string $filename    Output file
+     * @access   private
+     */
     function _move($resourceId, $ftempname, $filename) 
     {
         // opening ftemp to read
@@ -501,15 +502,15 @@ class Mail_Mbox extends PEAR
     }
 
     /**
-    * Process the Mbox
-    *
-    * Roles:
-    * - Count the messages
-    * - Get start bytes and end bytes of each messages
-    *
-    * @param    int $resourceId     Mbox resouce id created by open
-    * @access   private
-    */
+     * Process the Mbox
+     *
+     * Roles:
+     * - Count the messages
+     * - Get start bytes and end bytes of each messages
+     *
+     * @param    int $resourceId     Mbox resouce id created by open
+     * @access   private
+     */
     function _process($resourceId)
     {
         // sanity check
@@ -550,7 +551,7 @@ class Mail_Mbox extends PEAR
 
         // if there are just one message, or if it's the last one,
         // add it to messages positions
-        if (($start == 0 && $hasmessage === true) || $start > 0) {
+        if (($start == 0 && $hasmessage === true) || ($start > 0)) {
             $this->_resources[$resourceId]["messages"][] = array($start, ftell($this->_resources[$resourceId]['fresource']));
         }
     }
