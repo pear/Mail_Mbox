@@ -2,7 +2,7 @@
 <package version="1.0">
   <name>Mail_Mbox</name>
   <summary>Mbox PHP class to Unix MBOX parsing and using.</summary>
-  <license>LGPL</license>
+  <license>PHP License</license>
   <description>It can split messages inside a Mbox, return the number of messages, return, update or remove an specific message or add a message on the Mbox.</description>
   <maintainers>
     <maintainer>
@@ -23,9 +23,9 @@ o some minor spelling errors  (Roger Keays)
 o fwrite must use '===' false instead of !fwrite (Roger Keays)</notes>
     <filelist>
         <dir name="/" baseinstalldir="Mail">
-            <file role="php" name="mbox.php" md5sum="747fbb5b793642372e68b608e2a72742" />
+            <file role="php" name="mbox.php" md5sum="cd521487966526d77e6f0a50f171e34d" />
             <dir name="tests" role="test">
-                <file name="mbox_test.php" md5sum="86931f9b4e844f211f3fea46944d1170" />
+                <file name="mbox_test.php" md5sum="23f802b5a858ff50777a724a2b0f8fb4" />
             </dir>
         </dir>
     </filelist>
