@@ -12,17 +12,23 @@
     </maintainer>
   </maintainers>
   <release>
-    <version>0.1.3</version>
+    <version>0.1.4</version>
     <date>2002-12-28</date>
     <license>PHP</license>
     <state>alpha</state>
-    <notes>o First release</notes>
+    <notes>o Joined mbox_test.php and mbox.php</notes>
     <filelist>
-      <file role="php" baseinstalldir="Mail" md5sum="cafaa4c67ced2395a3d241118c1d98d9" name="mbox.php"/>
-      <file role="php" baseinstalldir="Mail" md5sum="7f709f7ade286eea34cb59a47af1dffa" name="mbox_test.php"/>
+      <file role="php" baseinstalldir="Mail" md5sum="dffb82bcc775fa94f8b4bf7a9bfab5dc" name="mbox.php"/>
     </filelist>
   </release>
   <changelog>
+    <release>
+      <version>0.1.4</version>
+      <date>2002-12-28</date>
+      <state>alpha</state>
+      <notes>o Joined mbox_test.php and mbox.php
+</notes>
+    </release>
     <release>
       <version>0.1.3</version>
       <date>2002-12-28</date>
