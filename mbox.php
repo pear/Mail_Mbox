@@ -536,51 +536,50 @@ class Mail_Mbox extends PEAR
 
         while (feof($this->_resources[$resourceId]["fresource"]) != true) {
             // getting char by char
-            $c = fgetc($this->_resources[$resourceId]["fresource"]);
-            $lineThis .= $c;
-            // each \n we will check things 
-            if ($c === "\n") {
-                // checking if start with From
-                if (substr($lineThis, 0, 5) === "From ") {
-                    // this line byte count is last line more 1 byte
-                    $bytesStart = $bytesEnd + 1;
-                    // last line byte count is this line bytes minus this line length
-                    $bytesEnd = $bytes - strlen($lineThis);
-                    // we will check messages after they end
-                    if ($bytesStart != 1) {
-                        if ($this->debug) {
-                            printf("#################### from byte %08d to byte %08d ################### <br />", $bytesStart, $bytesEnd);
-                        }
-
-                        // setting new message points
-                        $messagesCount = $this->size($resourceId);
-                        $this->_resources[$resourceId]["messages"][$messagesCount][0] = $bytesStart;
-                        $this->_resources[$resourceId]["messages"][$messagesCount][1] = $bytesEnd;
+            $lineThis = fgets($this->_resources[$resourceId]["fresource"]);
+            if (feof($this->_resources[$resourceId]["fresource"])) {
+                break;
+            }
+            $bytes    += strlen($lineThis);
+            // checking if start with From
+            if (substr($lineThis, 0, 5) === "From ") {
+                // this line byte count is last line more 1 byte
+                $bytesStart = $bytesEnd + 1;
+                // last line byte count is this line bytes minus this line length
+                $bytesEnd = $bytes - strlen($lineThis);
+                // we will check messages after they end
+                if ($bytesStart != 1) {
+                    if ($this->debug) {
+                        printf("#################### from byte %08d to byte %08d ################### <br />", $bytesStart, $bytesEnd);
                     }
-                }
 
-                // increasing number of lines (doesn't matter)
-                if ($this->debug) {
-                    $lines++;
-                }
- 
-                // last line is this line
-                $lineLast = $lineThis;
-
-                // this line is blank now
-                unset($lineThis);
-                if ($this->debug) {
-                    printf("%08d:%08d %s<br/>", $lines, $bytes, $lineLast);
+                    // setting new message points
+                    $messagesCount = $this->size($resourceId);
+                    $this->_resources[$resourceId]["messages"][$messagesCount][0] = $bytesStart;
+                    $this->_resources[$resourceId]["messages"][$messagesCount][1] = $bytesEnd;
                 }
             }
-            $bytes++;
+
+            // increasing number of lines (doesn't matter)
+            if ($this->debug) {
+                $lines++;
+            }
+
+            // last line is this line
+            $lineLast = $lineThis;
+
+            // this line is blank now
+            unset($lineThis);
+            if ($this->debug) {
+                printf("%08d:%08d %s<br/>", $lines, $bytes, $lineLast);
+            }
         }
         // last message must be made here - again same things - 
 
         // this line byte count is last line more 1 byte
         $bytesStart = $bytesEnd + 1;
-        // last line byte count is this line bytes minus this line length
-        $bytesEnd = $bytes - strlen($lineThis) - 2;
+        // last line byte count is this line bytes minus this line length and the blank line from Mbox format
+        $bytesEnd = $bytes - strlen($lineThis) - 1;
         // we will check messages after they end
 
         $messagesCount = $this->size($resourceId);
