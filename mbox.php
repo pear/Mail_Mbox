@@ -237,7 +237,7 @@ class Mail_Mbox extends PEAR
      */
     function size($resourceId)
     {
-        if (array_key_exists('messages', $this->_resources[$resourceId])) {
+        if (is_array($this->_resources[$resourceId]["messages"] && array_key_exists('messages', $this->_resources[$resourceId]))) {
             return sizeof($this->_resources[$resourceId]["messages"]);
         } else {
             return 0;

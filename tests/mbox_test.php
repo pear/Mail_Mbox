@@ -48,6 +48,10 @@ EOF;
     // opennign file mbox
     $mid     =     $mbox->open("mbox");
 
+    if (PEAR::isError($mid)) {
+        die("Cannot open mbox file");
+    } 
+
     if ($mbox->size($mid) == 0) {
         print "No message found";
     }

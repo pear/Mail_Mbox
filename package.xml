@@ -4,6 +4,7 @@
   <summary>Mbox PHP class to Unix MBOX parsing and using.</summary>
   <license>PHP</license>
   <description>It can split messages inside a Mbox, return the number of messages, return, update or remove an specific message or add a message on the Mbox.</description>
+  
   <maintainers>
     <maintainer>
       <user>darkelder</user>
@@ -12,6 +13,23 @@
       <role>lead</role>
     </maintainer>
   </maintainers>
+
+  <release>
+    <version>0.3.0</version>
+    <date>2004-11-01</date>
+    <state>beta</state>
+    <notes>o improved _process() speed to read line per line instead of byte per byte. (Joern)</notes>
+    <filelist>
+        <dir name="/" baseinstalldir="Mail">
+            <file role="php" name="mbox.php" md5sum="11dd7a3c16b0bc5c54614a76ff837c43" />
+            <dir name="tests" role="test">
+                <file name="mbox_test.php" md5sum="23f802b5a858ff50777a724a2b0f8fb4" />
+            </dir>
+        </dir>
+    </filelist>
+  </release>  
+
+  <changelog>
   <release>
     <version>0.2.0</version>
     <date>2004-10-06</date>
@@ -30,7 +48,6 @@ o fwrite must use '===' false instead of !fwrite (Roger Keays)</notes>
         </dir>
     </filelist>
   </release>  
-  <changelog>
     <release>
       <version>0.1.5</version>
       <date>2002-12-29</date>
