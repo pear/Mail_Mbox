@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------+
 // | PHP version 4                                                        |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2003 The PHP Group                                |
+// | Copyright (c) 1997-2002 The PHP Group                                |
 // +----------------------------------------------------------------------+
 // | This source file is subject to version 2.0 of the PHP license,       |
 // | that is bundled with this package in the file LICENSE, and is        |
@@ -24,7 +24,7 @@ require_once "PEAR.php";
     * Mbox PHP class to Unix MBOX parsing and using
     * 
     * LICENSE (LGPL)
-    * Copyright (c) 2002-2003 Roberto Berto
+    * Copyright (C) 2002-2003 Roberto Berto
     * This library is free software; you can redistribute it and/or
     * modify it under the terms of the GNU Lesser General Public
     * License as published by the Free Software Foundation; either
@@ -165,9 +165,9 @@ class Mail_Mbox extends PEAR
     * Resources data like file name, file resource, mbox number, and other 
     * cacheds things are stored here.
     *
-    * Note that it isnt really a valid resource type. It is of int type.
+    * Note that it isnt really a valid resource type. It is of array type.
     *
-    * @var      int        
+    * @var      array
     * @access   private
     */
     var $_resources;
@@ -253,7 +253,11 @@ class Mail_Mbox extends PEAR
     */
     function size($resourceId)
     {
-        return sizeof($this->_resources[$resourceId]["messages"]);
+        if (array_key_exists('messages', $this->_resources[$resourceId])) {
+            return sizeof($this->_resources[$resourceId]["messages"]);
+        } else {
+            return 0;
+        }
     }    
 
     /**
@@ -305,15 +309,23 @@ class Mail_Mbox extends PEAR
     * Note: messages start with 0.
     *
     * @param    int $resourceId     Mbox resouce id created by open
-    * @param    int $message        The number of Message to remove
+    * @param    int $message        The number of Message to remove, or
+    *                               array of message ids to remove
     * @return   mixed               Return true else pear error class
     * @access   public
     */
     function remove($resourceId, $message)
     {
+        // convert single message to array
+        if (!is_array($message)) {
+            $message = array($message);
+        }
+
         // checking if we have bytes locations for this message
-        if (!is_array($this->_resources[$resourceId]["messages"][$message])) {
-            return PEAR::raiseError("Message doesnt exists.");
+        foreach ($message as $msg) {
+            if (!is_array($this->_resources[$resourceId]["messages"][$msg])) {
+                return PEAR::raiseError("Message $msg doesn't exist.");
+            }
         }
 
         // changing umask for security reasons
@@ -328,11 +340,11 @@ class Mail_Mbox extends PEAR
             return PEAR::raiseError("Cannot create a temp file. Cannot handle this error.");            
         }
 
-        // writting only undeleted messages 
+        // writing only undeleted messages 
         $messages = $this->size($resourceId);
 
         for ($x = 0; $x < $messages; $x++) {
-            if ($x == $message) {
+            if (in_array($x, $message)) {
                 continue;    
             }
 
@@ -377,7 +389,7 @@ class Mail_Mbox extends PEAR
             return PEAR::raiseError("Cannot create a temp file. Cannot handle this error.");
         }
 
-        // writting only undeleted messages
+        // writing only undeleted messages
         $messages = $this->size($resourceId);
 
         for ($x = 0; $x < $messages; $x++) {
@@ -430,7 +442,7 @@ class Mail_Mbox extends PEAR
             return PEAR::raiseError("Cannot create a temp file. Cannot handle this error.");
         }
 
-        // writting only undeleted messages
+        // writing only undeleted messages
         $messages = $this->size($resourceId);
         $content .= "\n\n";
 
@@ -488,7 +500,7 @@ class Mail_Mbox extends PEAR
 
         while (feof($ftemp) != true) {
             $strings = fread($ftemp, 4096);
-            if (!fwrite($fp, $strings, strlen($strings))) {
+            if (fwrite($fp, $strings, strlen($strings)) === false) {
                 return PEAR::raiseError("Cannot write to file.");
             }
         }
@@ -517,7 +529,7 @@ class Mail_Mbox extends PEAR
     */
     function _process($resourceId)
     {
-        // sanit check
+        // sanity check
         if (!is_resource($this->_resources[$resourceId]["fresource"])) {
             return PEAR::raiseError("Resource isn't valid.");
         }
@@ -529,62 +541,66 @@ class Mail_Mbox extends PEAR
 
         // starting values
         $bytes = 0;
+        $bytesEnd = 0;
         $lines = 0;
 
-        unset($lineThis);
+        $lineThis = '';
         unset($lineLast);
 
         while (feof($this->_resources[$resourceId]["fresource"]) != true) {
             // getting char by char
-            $lineThis = fgets($this->_resources[$resourceId]["fresource"]);
-            if (feof($this->_resources[$resourceId]["fresource"])) {
-                break;
-            }
-            $bytes    += strlen($lineThis);
-            // checking if start with From
-            if (substr($lineThis, 0, 5) === "From ") {
-                // this line byte count is last line more 1 byte
-                $bytesStart = $bytesEnd + 1;
-                // last line byte count is this line bytes minus this line length
-                $bytesEnd = $bytes - strlen($lineThis);
-                // we will check messages after they end
-                if ($bytesStart != 1) {
-                    if ($this->debug) {
-                        printf("#################### from byte %08d to byte %08d ################### <br />", $bytesStart, $bytesEnd);
-                    }
+            $c = fgetc($this->_resources[$resourceId]["fresource"]);
+            $lineThis .= $c;
+            // each \n we will check things 
+            if ($c === "\n") {
+                // checking if start with From
+                if (substr($lineThis, 0, 5) === "From ") {
+                    // this line byte count is last line more 1 byte
+                    $bytesStart = $bytesEnd + 1;
+                    // last line byte count is this line bytes minus this line length
+                    $bytesEnd = $bytes - strlen($lineThis);
+                    // we will check messages after they end
+                    if ($bytesStart != 1) {
+                        if ($this->debug) {
+                            printf("#################### from byte %08d to byte %08d ################### <br />", $bytesStart, $bytesEnd);
+                        }
 
-                    // setting new message points
-                    $messagesCount = $this->size($resourceId);
-                    $this->_resources[$resourceId]["messages"][$messagesCount][0] = $bytesStart;
-                    $this->_resources[$resourceId]["messages"][$messagesCount][1] = $bytesEnd;
+                        // setting new message points
+                        $messagesCount = $this->size($resourceId);
+                        $this->_resources[$resourceId]["messages"][$messagesCount][0] = $bytesStart;
+                        $this->_resources[$resourceId]["messages"][$messagesCount][1] = $bytesEnd;
+                    }
+                }
+
+                // increasing number of lines (doesn't matter)
+                if ($this->debug) {
+                    $lines++;
+                }
+ 
+                // last line is this line
+                $lineLast = $lineThis;
+
+                // this line is blank now
+                $lineThis = '';
+                if ($this->debug) {
+                    printf("%08d:%08d %s<br/>", $lines, $bytes, $lineLast);
                 }
             }
-
-            // increasing number of lines (doesn't matter)
-            if ($this->debug) {
-                $lines++;
-            }
-
-            // last line is this line
-            $lineLast = $lineThis;
-
-            // this line is blank now
-            unset($lineThis);
-            if ($this->debug) {
-                printf("%08d:%08d %s<br/>", $lines, $bytes, $lineLast);
-            }
+            $bytes++;
         }
         // last message must be made here - again same things - 
 
         // this line byte count is last line more 1 byte
         $bytesStart = $bytesEnd + 1;
-        // last line byte count is this line bytes minus this line length and the blank line from Mbox format
-        $bytesEnd = $bytes - strlen($lineThis) - 1;
+        // last line byte count is this line bytes minus this line length
+        $bytesEnd = $bytes - strlen($lineThis) - 2;
         // we will check messages after they end
 
-        $messagesCount = $this->size($resourceId);
-        $this->_resources[$resourceId]["messages"][$messagesCount][0] = $bytesStart;
-        $this->_resources[$resourceId]["messages"][$messagesCount][1] = $bytesEnd;
+        if ($bytesEnd > 0) {
+            $messagesCount = $this->size($resourceId);
+            $this->_resources[$resourceId]["messages"][$messagesCount][0] = $bytesStart;
+            $this->_resources[$resourceId]["messages"][$messagesCount][1] = $bytesEnd;
+        }
     }    
 }
   
