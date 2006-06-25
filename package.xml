@@ -1,75 +1,175 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<package version="1.0">
-  <name>Mail_Mbox</name>
-  <summary>Mbox PHP class to Unix MBOX parsing and using.</summary>
-  <license>PHP</license>
-  <description>It can split messages inside a Mbox, return the number of messages, return, update or remove an specific message or add a message on the Mbox.</description>
-  
-  <maintainers>
-    <maintainer>
-      <user>darkelder</user>
-      <name>Roberto Berto</name>
-      <email>darkelder@php.net</email>
-      <role>lead</role>
-    </maintainer>
-  </maintainers>
+<?xml version="1.0" encoding="UTF-8"?>
+<package packagerversion="1.4.8" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+ <name>Mail_Mbox</name>
+ <channel>pear.php.net</channel>
+ <summary>Read and modify Unix MBOXes</summary>
+ <description>
+  It can split messages inside a Mbox, return the number of messages, return,
+  update or remove an specific message or add a message on the Mbox.
+ </description>
+
+ <lead>
+  <name>Roberto Berto</name>
+  <user>darkelder</user>
+  <email>darkelder@php.net</email>
+  <active>yes</active>
+ </lead>
+ <lead>
+  <name>Christian Weiske</name>
+  <user>cweiske</user>
+  <email>cweiske@php.net</email>
+  <active>yes</active>
+</lead>
+
+ <date>2006-06-25</date>
+
+ <version>
+  <release>0.5.0</release>
+  <api>0.5.0</api>
+ </version>
+ <stability>
+  <release>beta</release>
+  <api>beta</api>
+ </stability>
+
+ <license uri="http://www.gnu.org/licenses/lgpl.html">LGPL</license>
+
+ <notes>
+  - Use class features (one mbox per instance)
+  - Broke BC
+  - Checks for file modification, so that mbox doesn't get corrupt.
+ </notes>
+
+ <contents>
+  <dir name="/" baseinstalldir="/">
+    <dir name="Mail">
+      <file name="Mbox.php" role="php"/>
+    </dir>
+    <dir name="examples" baseinstalldir="Mail_Mbox">
+      <file name="demobox" role="doc"/>
+      <file name="mimedecode.php" role="doc"/>
+      <file name="modify.php" role="doc"/>
+      <file name="read.php" role="doc"/>
+    </dir>
+    <dir name="tests">
+      <file name="AllTests.php" role="test"/>
+      <file name="Mail_MboxTest.php" role="test"/>
+      <file name="testbox" role="test"/>
+    </dir>
+  </dir>
+ </contents>
+
+ <dependencies>
+  <required>
+   <php>
+    <min>4.3</min>
+    <max>6.0.0</max>
+   </php>
+   <pearinstaller>
+    <min>1.4.1</min>
+   </pearinstaller>
+  </required>
+ </dependencies>
+ <phprelease />
+
+ <changelog>
 
   <release>
-    <version>0.3.0</version>
-    <date>2004-11-01</date>
-    <state>beta</state>
-    <notes>o improved _process() speed to read line per line instead of byte per byte. (Joern)</notes>
-    <filelist>
-        <dir name="/" baseinstalldir="Mail">
-            <file role="php" name="mbox.php" md5sum="11dd7a3c16b0bc5c54614a76ff837c43" />
-            <dir name="tests" role="test">
-                <file name="mbox_test.php" md5sum="23f802b5a858ff50777a724a2b0f8fb4" />
-            </dir>
-        </dir>
-    </filelist>
-  </release>  
+   <version>
+    <release>0.5.0</release>
+    <api>0.5.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2006-06-23</date>
+   <notes>
+    - Use class features (one mbox per instance)
+    - Broke BC
+    - Checks for file modification, so that mbox doesn't get corrupt.
+    </notes>
+  </release>
 
-  <changelog>
   <release>
-    <version>0.2.0</version>
-    <date>2004-10-06</date>
-    <state>alpha</state>
-    <notes>o fixed mbox::size() bug that have never return 0 (Roger Keays)
-o mbox::remove() now accept arrays on $message param as well (Roger Keays)
-o declarated all vars to skip php warnings on high warning levels (Roger Keays)
-o some minor spelling errors  (Roger Keays)
-o fwrite must use '===' false instead of !fwrite (Roger Keays)</notes>
-    <filelist>
-        <dir name="/" baseinstalldir="Mail">
-            <file role="php" name="mbox.php" md5sum="3a3003027f21bd611c7967b8b19103b5" />
-            <dir name="tests" role="test">
-                <file name="mbox_test.php" md5sum="23f802b5a858ff50777a724a2b0f8fb4" />
-            </dir>
-        </dir>
-    </filelist>
-  </release>  
-    <release>
-      <version>0.1.5</version>
-      <date>2002-12-29</date>
-      <state>alpha</state>
-      <notes>o Security fix (changed umask on temp files)
-o Improved stylistcs with new Jon Parise patch
-o Fixed error on license at project.xml (it isnt really PHP license, it is LGPL)
-</notes>
-    </release>
-    <release>
-      <version>0.1.4</version>
-      <date>2002-12-28</date>
-      <state>alpha</state>
-      <notes>o Joined mbox_test.php and mbox.php
-</notes>
-    </release>
-    <release>
-      <version>0.1.3</version>
-      <date>2002-12-28</date>
-      <state>alpha</state>
-      <notes>o Changed Jon Parise stylistics things
-</notes>
-    </release>
-  </changelog>
+   <version>
+    <release>0.3.0</release>
+    <api>0.3.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2004-11-01</date>
+   <notes>
+     o improved _process() speed to read line per line instead of byte per byte. (Joern)
+    </notes>
+  </release>
+
+  <release>
+   <version>
+    <release>0.2.0</release>
+    <api>0.2.0</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2004-10-06</date>
+   <notes>
+     o fixed mbox::size() bug that have never return 0 (Roger Keays)
+     o mbox::remove() now accept arrays on $message param as well (Roger Keays)
+     o declarated all vars to skip php warnings on high warning levels (Roger Keays)
+     o some minor spelling errors  (Roger Keays)
+     o fwrite must use '===' false instead of !fwrite (Roger Keays)
+    </notes>
+  </release>
+
+  <release>
+   <version>
+    <release>0.1.5</release>
+    <api>0.1.5</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2002-12-29</date>
+   <notes>
+     o Security fix (changed umask on temp files)
+     o Improved stylistcs with new Jon Parise patch
+     o Fixed error on license at project.xml (it isnt really PHP license, it is LGPL)
+   </notes>
+  </release>
+
+  <release>
+   <version>
+    <release>0.1.4</release>
+    <api>0.1.4</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2002-12-28</date>
+   <notes>
+    o Joined mbox_test.php and mbox.php
+   </notes>
+  </release>
+
+  <release>
+   <version>
+    <release>0.1.3</release>
+    <api>0.1.3</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2002-12-28</date>
+   <notes>
+       o Changed Jon Parise stylistics things
+   </notes>
+  </release>
+ </changelog>
 </package>
