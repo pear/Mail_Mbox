@@ -59,6 +59,18 @@ class Mail_Mbox extends PEAR
      */
     var $debug = false;
 
+    /**
+     * Directory in which the temporary mbox files are created.
+     * Even if it's a unix directory, it does work on windows as
+     * the only function it's used in is tempnam which automatically
+     * chooses the right temp directory if this here doesn't exist.
+     * So this variable is for special needs only.
+     *
+     * @var      string
+     * @access   public
+     */
+    var $tmpdir = '/tmp';
+
 
 
     /**
@@ -206,7 +218,7 @@ class Mail_Mbox extends PEAR
         // changing umask for security reasons
         $umaskOld   = umask(077);
         // creating temp file
-        $ftempname  = tempnam ('/tmp', 'Mail_Mbox');
+        $ftempname  = tempnam($this->tmpdir, 'Mail_Mbox');
         // returning to old umask
         umask($umaskOld);
 
@@ -260,7 +272,7 @@ class Mail_Mbox extends PEAR
         }
 
         // creating temp file
-        $ftempname  = tempnam ('/tmp', 'Mail_Mbox');
+        $ftempname  = tempnam($this->tmpdir, 'Mail_Mbox');
         $ftemp = fopen($ftempname, 'w');
         if ($ftemp === false) {
             return PEAR::raiseError('Cannot create temp file "' . $ftempname . '" . Cannot handle this error.');
@@ -313,7 +325,7 @@ class Mail_Mbox extends PEAR
         }
 
         // creating temp file
-        $ftempname  = tempnam ('/tmp', 'Mail_Mbox');
+        $ftempname  = tempnam($this->tmpdir, 'Mail_Mbox');
         $ftemp = fopen($ftempname, 'w');
         if ($ftemp === false) {
             return PEAR::raiseError('Cannot create temp file "' . $ftempname . '". Cannot handle this error.');
