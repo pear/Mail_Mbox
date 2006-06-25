@@ -1,61 +1,76 @@
 <?php
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-// +----------------------------------------------------------------------+
-// | PHP version 4                                                        |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 1997-2004 The PHP Group                                |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 3.0 of the PHP license,       |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available through the world-wide-web at the following url:           |
-// | http://www.php.net/license/3_0.txt.                                  |
-// | If you did not receive a copy of the PHP license and are unable to   |
-// | obtain it through the world-wide-web, please send a note to          |
-// | license@php.net so we can mail you a copy immediately.               |
-// +----------------------------------------------------------------------+
-// | Authors: Roberto Berto <darkelder.php.net>                           |
-// +----------------------------------------------------------------------+
-//
-// $Id$
-
 require_once 'PEAR.php';
 
 /**
 *   Class to read mbox mail files.
+*
+*   An mbox mail file is contains plain emails concatenated in one
+*   big file. Since each mail starts with "From ", and ends with a newline,
+*   they can be separated from each other.
+*
+*   This class takes a mbox filename in the constructor, generates an
+*   index where the mails start and end when calling open() and returns
+*   single mails with get(), using the positions in the index.
+*
+*   With the help of this class, you also can add(), remove() and update()
+*   messages in the mbox file. When calling one of this methods, the class
+*   checks if the file has been modified since the index was created -
+*   changing the file with the wrong positions in the index would very likely
+*   corrupt it.
+*   This check is not done when retrieving single messages via get(), as this
+*   would slow down the process if you retrieve thousands of mails. You can,
+*   however, call hasBeenModified() before using get() to check for modification
+*   yourself. If the method returns true, you should close() and re-open() the
+*   file.
+*
+*   If something strange happens and you don't know why, activate debugging with
+*   setDebug(true). You also can modify the temporary directory in which changed
+*   mboxes are stored when adding/removing/modifying by using setTmpDir('/path/');
+*
+*   @category   Mail
+*   @package    Mail_Mbox
+*   @author     Roberto Berto <darkelder@php.net>
+*   @author     Christian Weiske <cweiske@php.net>
+*   @license    LGPL
+*   @version    CVS: $Id$
 */
 class Mail_Mbox extends PEAR
 {
     /**
-    * File resource / handle
-    *
-    * @var      resource
-    * @access   protected
-    */
+     * File resource / handle
+     *
+     * @var      resource
+     * @access   protected
+     */
     var $_resource = null;
 
     /**
-     * Message index
+     * Message index. Each mail has its own subarray,
+     * which contains the start position and end position
+     * as first and second subindex.
      *
-     * @var array
-     * @access protected
+     * @var     array
+     * @access  protected
      */
     var $_index = null;
 
     /**
-     * Timestamp at which the file has been modified last
+     * Timestamp at which the file has been modified last.
      *
-     * @var int
-     * @access protected
+     * @var     int
+     * @access  protected
      */
     var $_lastModified = null;
 
     /**
      * Debug mode
      *
-     * Set to true to turn on debug mode
+     * Set to true to turn on debug mode.
      *
-     * @var      bool
-     * @access   public
+     * @var     bool
+     * @access  public
+     * @see     setDebug()
+     * @see     getDebug()
      */
     var $debug = false;
 
@@ -66,8 +81,10 @@ class Mail_Mbox extends PEAR
      * chooses the right temp directory if this here doesn't exist.
      * So this variable is for special needs only.
      *
-     * @var      string
-     * @access   public
+     * @var     string
+     * @access  public
+     * @see     getTmpDir()
+     * @see     setTmpDir()
      */
     var $tmpdir = '/tmp';
 
