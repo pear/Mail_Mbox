@@ -226,6 +226,45 @@ class Mail_MboxTest extends PHPUnit2_Framework_TestCase {
         $this->assertTrue($mbox->close());
     }
 
+    public function testSetTmpDir()
+    {
+        $this->assertEquals('/tmp', $this->mbox->tmpdir);
+        $this->mbox->setTmpDir('/this/is/a/tmp/dir');
+        $this->assertEquals('/this/is/a/tmp/dir', $this->mbox->tmpdir);
+    }
+
+    public function testGetTmpDir()
+    {
+        $this->assertEquals('/tmp', $this->mbox->tmpdir);
+        $this->assertEquals('/tmp', $this->mbox->getTmpDir());
+        $this->mbox->setTmpDir('/this/is/a/tmp/dir');
+        $this->assertEquals('/this/is/a/tmp/dir', $this->mbox->tmpdir);
+        $this->assertEquals('/this/is/a/tmp/dir', $this->mbox->getTmpDir());
+    }
+
+    public function testSetDebug()
+    {
+        $this->assertFalse($this->mbox->debug);
+        $this->mbox->setDebug(true);
+        $this->assertTrue($this->mbox->debug);
+        $this->mbox->setDebug(false);
+        $this->assertFalse($this->mbox->debug);
+    }
+
+    public function testGetDebug()
+    {
+        $this->assertFalse($this->mbox->debug);
+        $this->assertFalse($this->mbox->getDebug());
+
+        $this->mbox->setDebug(true);
+        $this->assertTrue($this->mbox->debug);
+        $this->assertTrue($this->mbox->getDebug());
+
+        $this->mbox->setDebug(false);
+        $this->assertFalse($this->mbox->debug);
+        $this->assertFalse($this->mbox->getDebug());
+    }
+
 
     protected function copy()
     {

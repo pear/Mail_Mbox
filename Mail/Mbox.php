@@ -466,6 +466,55 @@ class Mail_Mbox extends PEAR
     {
         return filemtime($this->_file) > $this->_lastModified;
     }
-}
 
+
+
+    /*
+     * Dumb getter and setter
+     */
+
+
+
+    /**
+     * Set the directory for temporary files.
+     * @see Mail_Mbox::$tmpdir
+     *
+     * @param string $tmpdir    The new temporary directory
+     */
+    function setTmpDir($tmpdir)
+    {
+        $this->tmpdir = $tmpdir;
+    }
+
+    /**
+     * Returns the temporary directory
+     *
+     * @return string   The temporary directory
+     */
+    function getTmpDir()
+    {
+        return $this->tmpdir;
+    }
+
+    /**
+     * Set the debug flag
+     * @see Mail_Mbox::$debug
+     *
+     * @param boolean $debug    If debug is on or off
+     */
+    function setDebug($debug)
+    {
+        $this->debug = $debug;
+    }
+
+    /**
+     * Returns the debug flag setting
+     *
+     * @return boolean  If debug is enabled.
+     */
+    function getDebug()
+    {
+        return $this->debug;
+    }
+}
 ?>
