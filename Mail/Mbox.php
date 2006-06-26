@@ -1,5 +1,68 @@
 <?php
+/**
+*   Class to read mbox mail files.
+*
+*   @category   Mail
+*   @package    Mail_Mbox
+*   @author     Roberto Berto <darkelder@php.net>
+*   @author     Christian Weiske <cweiske@php.net>
+*   @license    LGPL
+*   @version    CVS: $Id$
+*/
 require_once 'PEAR.php';
+
+/**
+*   The file has been modified since it has been opened.
+*   You should close and re-open it.
+*/
+define('MAIL_MBOX_ERROR_MODIFIED'            , 2101);
+
+/**
+*   The mail mbox file doesn't exist.
+*/
+define('MAIL_MBOX_ERROR_FILE_NOT_EXISTING'   , 2102);
+
+/**
+*   There is no message with the given number.
+*/
+define('MAIL_MBOX_ERROR_MESSAGE_NOT_EXISTING', 2103);
+
+/**
+*   No permission to access the file.
+*/
+define('MAIL_MBOX_ERROR_NO_PERMISSION'       , 2104);
+
+/**
+*   The file cannot be opened.
+*/
+define('MAIL_MBOX_ERROR_CANNOT_OPEN'         , 2105);
+
+/**
+*   The file cannot be closed due to some strange things.
+*/
+define('MAIL_MBOX_ERROR_CANNOT_CLOSE'        , 2106);
+
+/**
+*   The file cannot be read.
+*/
+define('MAIL_MBOX_ERROR_CANNOT_READ'         , 2107);
+
+/**
+*   Failed to create a temporary file.
+*/
+define('MAIL_MBOX_ERROR_CANNOT_CREATE_TMP'   , 2108);
+
+/**
+*   The file cannot be written.
+*/
+define('MAIL_MBOX_ERROR_CANNOT_WRITE'        , 2109);
+
+/**
+*   The file is not open.
+*/
+define('MAIL_MBOX_ERROR_NOT_OPEN'            , 2110);
+
+
 
 /**
 *   Class to read mbox mail files.
@@ -114,14 +177,20 @@ class Mail_Mbox extends PEAR
     {
         // check if file exists else return pear error
         if (!file_exists($this->_file)) {
-            return PEAR::raiseError('Cannot open the mbox file "' . $this->_file . '": file does not exist.');
+            return PEAR::raiseError(
+                'Cannot open the mbox file "' . $this->_file . '": file does not exist.',
+                MAIL_MBOX_ERROR_NOT_EXISTING
+            );
         }
 
         // opening the file
         $this->_lastModified = filemtime($this->_file);
         $this->_resource = fopen($this->_file, 'r');
         if (!is_resource($this->_resource)) {
-            return PEAR::raiseError('Cannot open the mbox file: maybe without permission.');
+            return PEAR::raiseError(
+                'Cannot open the mbox file: maybe without permission.',
+                MAIL_MBOX_ERROR_NO_PERMISSION
+            );
         }
 
         // process the file and get the messages bytes offsets
@@ -141,11 +210,17 @@ class Mail_Mbox extends PEAR
     function close()
     {
         if (!is_resource($this->_resource)) {
-            return PEAR::raiseError('Cannot close the mbox file because it was not open.');
+            return PEAR::raiseError(
+                'Cannot close the mbox file because it was not open.',
+                MAIL_MBOX_ERROR_NOT_OPEN
+            );
         }
 
         if (!fclose($this->_resource)) {
-            return PEAR::raiseError('Cannot close the mbox, maybe file is being used (?)');
+            return PEAR::raiseError(
+                'Cannot close the mbox, maybe file is being used (?)',
+                MAIL_MBOX_ERROR_CANNOT_CLOSE
+            );
         }
 
         return true;
@@ -180,7 +255,10 @@ class Mail_Mbox extends PEAR
     {
         // checking if we have bytes locations for this message
         if (!is_array($this->_index[$message])) {
-            return PEAR::raiseError('Message does not exist.');
+            return PEAR::raiseError(
+                'Message does not exist.',
+                MAIL_MBOX_ERROR_MESSAGE_NOT_EXISTING
+            );
         }
 
         // getting bytes locations
@@ -194,7 +272,10 @@ class Mail_Mbox extends PEAR
 
         // seek to start of message
         if (fseek($this->_resource, $bytesStart) == -1) {
-            return PEAR::raiseError('Cannot read message bytes');
+            return PEAR::raiseError(
+                'Cannot read message bytes',
+                MAIL_MBOX_ERROR_CANNOT_READ
+            );
         }
 
         if ($bytesEnd - $bytesStart > 0) {
@@ -217,7 +298,10 @@ class Mail_Mbox extends PEAR
     function remove($message)
     {
         if ($this->hasBeenModified()) {
-            return PEAR::raiseError('File has been modified since loading. Re-open the file.');
+            return PEAR::raiseError(
+                'File has been modified since loading. Re-open the file.',
+                MAIL_MBOX_ERROR_MODIFIED
+            );
         }
 
         // convert single message to array
@@ -228,7 +312,10 @@ class Mail_Mbox extends PEAR
         // checking if we have bytes locations for this message
         foreach ($message as $msg) {
             if (!isset($this->_index[$msg]) || !is_array($this->_index[$msg])) {
-                return PEAR::raiseError('Message ' . $msg . 'does not exist.');
+                return PEAR::raiseError(
+                    'Message ' . $msg . 'does not exist.',
+                    MAIL_MBOX_ERROR_MESSAGE_NOT_EXISTING
+                );
             }
         }
 
@@ -241,7 +328,10 @@ class Mail_Mbox extends PEAR
 
         $ftemp      = fopen($ftempname, 'w');
         if ($ftemp === false) {
-            return PEAR::raiseError('Cannot create a temp file "' . $ftempname . '". Cannot handle this error.');
+            return PEAR::raiseError(
+                'Cannot create a temp file "' . $ftempname . '".',
+                MAIL_MBOX_ERROR_CANNOT_CREATE_TMP
+            );
         }
 
         // writing only undeleted messages 
@@ -280,19 +370,28 @@ class Mail_Mbox extends PEAR
     function update($message, $content)
     {
         if ($this->hasBeenModified()) {
-            return PEAR::raiseError('File has been modified since loading. Re-open the file.');
+            return PEAR::raiseError(
+                'File has been modified since loading. Re-open the file.',
+                MAIL_MBOX_ERROR_MODIFIED
+            );
         }
 
         // checking if we have bytes locations for this message
         if (!is_array($this->_index[$message])) {
-            return PEAR::raiseError('Message does not exists.');
+            return PEAR::raiseError(
+                'Message does not exist.',
+                MAIL_MBOX_ERROR_MESSAGE_NOT_EXISTING
+            );
         }
 
         // creating temp file
         $ftempname  = tempnam($this->tmpdir, 'Mail_Mbox');
         $ftemp = fopen($ftempname, 'w');
         if ($ftemp === false) {
-            return PEAR::raiseError('Cannot create temp file "' . $ftempname . '" . Cannot handle this error.');
+            return PEAR::raiseError(
+                'Cannot create temp file "' . $ftempname . '" .',
+                MAIL_MBOX_ERROR_CANNOT_CREATE_TMP
+            );
         }
 
         $messages = $this->size();
@@ -334,10 +433,13 @@ class Mail_Mbox extends PEAR
     function insert($content, $offset = null)
     {
         if ($this->hasBeenModified()) {
-            return PEAR::raiseError('File has been modified since loading. Re-open the file.');
+            return PEAR::raiseError(
+                'File has been modified since loading. Re-open the file.',
+                MAIL_MBOX_ERROR_MODIFIED
+            );
         }
 
-        if ($offset === -1) {
+        if ($offset < 0 || $offset == $this->size()) {
             $offset = null;
         }
 
@@ -345,7 +447,10 @@ class Mail_Mbox extends PEAR
         $ftempname  = tempnam($this->tmpdir, 'Mail_Mbox');
         $ftemp = fopen($ftempname, 'w');
         if ($ftemp === false) {
-            return PEAR::raiseError('Cannot create temp file "' . $ftempname . '". Cannot handle this error.');
+            return PEAR::raiseError(
+                'Cannot create temp file "' . $ftempname . '".',
+                MAIL_MBOX_ERROR_CANNOT_CREATE_TMP
+            );
         }
 
         // writing only undeleted messages
@@ -393,19 +498,28 @@ class Mail_Mbox extends PEAR
         $ftemp = fopen($ftempname, 'r');
 
         if ($ftemp === false) {
-            return PEAR::raiseError('Cannot open temp file "' . $ftempname . '".');
+            return PEAR::raiseError(
+                'Cannot open temp file "' . $ftempname . '".',
+                MAIL_MBOX_ERROR_CANNOT_OPEN
+            );
         }
 
         // copy from ftemp to fp
         $fp = fopen($filename, 'w');
         if ($fp === false) {
-            return PEAR::raiseError('Cannot write on mbox file "' . $filename . '".');
+            return PEAR::raiseError(
+                'Cannot write on mbox file "' . $filename . '".',
+                MAIL_MBOX_ERROR_CANNOT_OPEN
+            );
         }
 
         while (feof($ftemp) != true) {
             $strings = fread($ftemp, 4096);
             if (fwrite($fp, $strings, strlen($strings)) === false) {
-                return PEAR::raiseError('Cannot write to file "' . $filename . '".');
+                return PEAR::raiseError(
+                    'Cannot write to file "' . $filename . '".',
+                    MAIL_MBOX_ERROR_CANNOT_WRITE
+                );
             }
         }
 
@@ -431,12 +545,18 @@ class Mail_Mbox extends PEAR
 
         // sanity check
         if (!is_resource($this->_resource)) {
-            return PEAR::raiseError('Resource is not valid. Maybe the file has not be opened?');
+            return PEAR::raiseError(
+                'Resource is not valid. Maybe the file has not be opened?',
+                MAIL_MBOX_ERROR_NOT_OPEN
+            );
         }
 
         // going to start
         if (fseek($this->_resource, 0) == -1) {
-            return PEAR::raiseError('Cannot read mbox');
+            return PEAR::raiseError(
+                'Cannot read mbox',
+                MAIL_MBOX_ERROR_CANNOT_READ
+            );
         }
 
         // current start byte position
@@ -502,7 +622,10 @@ class Mail_Mbox extends PEAR
     function setTmpDir($tmpdir)
     {
         if (is_dir($tmpdir) && !is_writable($tmpdir)) {
-            return PEAR::raiseError('"' . $tmpdir . '" is not writable.');
+            return PEAR::raiseError(
+                '"' . $tmpdir . '" is not writable.',
+                MAIL_MBOX_ERROR_CANNOT_WRITE
+            );
         } else {
             $this->tmpdir = $tmpdir;
             return true;

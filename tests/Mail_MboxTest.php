@@ -218,10 +218,19 @@ class Mail_MboxTest extends PHPUnit2_Framework_TestCase {
         $this->assertTrue($mbox2->close());
 
         $this->assertTrue($mbox->hasBeenModified());
+
         //This methods should not allow modifying a changed file.
-        $this->assertType('PEAR_Error', $mbox->remove(0));
-        $this->assertType('PEAR_Error', $mbox->insert('Test'));
-        $this->assertType('PEAR_Error', $mbox->update(0, 'Test'));
+        $err = $mbox->remove(0);
+        $this->assertType('PEAR_Error', $err);
+        $this->assertEquals(MAIL_MBOX_ERROR_MODIFIED, $err->getCode());
+
+        $err = $mbox->insert('Test');
+        $this->assertType('PEAR_Error', $err);
+        $this->assertEquals(MAIL_MBOX_ERROR_MODIFIED, $err->getCode());
+
+        $err = $mbox->update(0, 'Test');
+        $this->assertType('PEAR_Error', $err);
+        $this->assertEquals(MAIL_MBOX_ERROR_MODIFIED, $err->getCode());
 
         $this->assertTrue($mbox->close());
     }
