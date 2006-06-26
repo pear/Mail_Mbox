@@ -383,7 +383,7 @@ class Mail_Mbox extends PEAR
      *
      * Used internally to copy the content of the temp file to the mbox file
      *
-     * @parm     string $ftempname   Source file - will be removed
+     * @param    string $ftempname   Source file - will be removed
      * @param    string $filename    Output file
      * @access   protected
      */
@@ -497,10 +497,16 @@ class Mail_Mbox extends PEAR
      * @see Mail_Mbox::$tmpdir
      *
      * @param string $tmpdir    The new temporary directory
+     * @return mixed  true if all is ok, PEAR_Error if $tmpdir is a dir but not writable
      */
     function setTmpDir($tmpdir)
     {
-        $this->tmpdir = $tmpdir;
+        if (is_dir($tmpdir) && !is_writable($tmpdir)) {
+            return PEAR::raiseError('"' . $tmpdir . '" is not writable.');
+        } else {
+            $this->tmpdir = $tmpdir;
+            return true;
+        }
     }
 
     /**
@@ -521,7 +527,7 @@ class Mail_Mbox extends PEAR
      */
     function setDebug($debug)
     {
-        $this->debug = $debug;
+        $this->debug = (bool)$debug;
     }
 
     /**

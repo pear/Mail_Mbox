@@ -229,15 +229,18 @@ class Mail_MboxTest extends PHPUnit2_Framework_TestCase {
     public function testSetTmpDir()
     {
         $this->assertEquals('/tmp', $this->mbox->tmpdir);
-        $this->mbox->setTmpDir('/this/is/a/tmp/dir');
+        $this->assertTrue($this->mbox->setTmpDir('/this/is/a/tmp/dir'));
         $this->assertEquals('/this/is/a/tmp/dir', $this->mbox->tmpdir);
+
+        $this->assertTrue($this->mbox->setTmpDir('/tmp'));
+        $this->assertEquals('/tmp', $this->mbox->tmpdir);
     }
 
     public function testGetTmpDir()
     {
         $this->assertEquals('/tmp', $this->mbox->tmpdir);
         $this->assertEquals('/tmp', $this->mbox->getTmpDir());
-        $this->mbox->setTmpDir('/this/is/a/tmp/dir');
+        $this->assertTrue($this->mbox->setTmpDir('/this/is/a/tmp/dir'));
         $this->assertEquals('/this/is/a/tmp/dir', $this->mbox->tmpdir);
         $this->assertEquals('/this/is/a/tmp/dir', $this->mbox->getTmpDir());
     }
