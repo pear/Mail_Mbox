@@ -21,11 +21,11 @@
   <active>yes</active>
 </lead>
 
- <date>2006-06-25</date>
+ <date>2006-08-01</date>
 
  <version>
-  <release>0.5.0</release>
-  <api>0.5.0</api>
+  <release>0.5.1</release>
+  <api>0.5.1</api>
  </version>
  <stability>
   <release>beta</release>
@@ -35,9 +35,9 @@
  <license uri="http://www.gnu.org/licenses/lgpl.html">LGPL</license>
 
  <notes>
-  - Use class features (one mbox per instance)
-  - Broke BC
-  - Checks for file modification, so that mbox doesn't get corrupt.
+  - Use copy/unlink internally instead of copying the file bit-by-bit
+  - Added append() method since it's faster than the old insert()
+  - Added autoReload property to make adding many messages faster
  </notes>
 
  <contents>
@@ -62,7 +62,7 @@
  <dependencies>
   <required>
    <php>
-    <min>4.3</min>
+    <min>4.3.3</min>
     <max>6.0.0</max>
    </php>
    <pearinstaller>
@@ -73,6 +73,23 @@
  <phprelease />
 
  <changelog>
+
+  <release>
+   <version>
+    <release>0.5.1</release>
+    <api>0.5.1</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2006-08-01</date>
+   <notes>
+    - Use copy/unlink internally instead of copying the file bit-by-bit
+    - Added append() method since it's faster than the old insert()
+    - Added autoReload property to make adding many messages faster
+    </notes>
+  </release>
 
   <release>
    <version>

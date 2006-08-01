@@ -178,6 +178,82 @@ class Mail_MboxTest extends PHPUnit2_Framework_TestCase {
     }
 
     /**
+     * Append an email to the end of the thingy
+     */
+    public function testAppend() {
+        $this->copy();
+        $mbox = new Mail_Mbox(Mail_MboxTest::$filecopy);
+        $this->assertTrue($mbox->open());
+        $this->assertEquals(11, $mbox->size());
+
+        $this->assertTrue($mbox->append(
+            $mbox->get(0)
+        ));
+        $this->assertEquals(12, $mbox->size());
+        $this->assertContains('My own hands', $mbox->get(11));
+
+        $this->assertTrue($mbox->append(
+            $mbox->get(0)
+        ));
+        $this->assertTrue($mbox->append(
+            $mbox->get(0)
+        ));
+        $this->assertTrue($mbox->append(
+            $mbox->get(0)
+        ));
+
+        $this->assertEquals(15, $mbox->size());
+        $this->assertContains('My own hands', $mbox->get(12));
+        $this->assertContains('My own hands', $mbox->get(13));
+        $this->assertContains('My own hands', $mbox->get(14));
+    }
+
+    /**
+     * Append an email to the end of the thingy
+     * without using auto-reopen.
+     */
+    public function testAppendNoReopen() {
+        $this->copy();
+        $mbox = new Mail_Mbox(Mail_MboxTest::$filecopy);
+        $mbox->setAutoReopen(false);
+
+        $this->assertTrue($mbox->open());
+        $this->assertEquals(11, $mbox->size());
+
+        $zero = $mbox->get(0);
+
+        $this->assertTrue($mbox->append(
+            $zero
+        ));
+        //should still be 11, since not reloaded
+        $this->assertEquals(11, $mbox->size());
+
+        $this->assertTrue($mbox->open());
+        $this->assertEquals(12, $mbox->size());
+        $this->assertContains('My own hands', $mbox->get(11));
+
+        $this->assertTrue($mbox->append(
+            $zero
+        ));
+        $this->assertTrue($mbox->append(
+            $zero
+        ));
+        $this->assertTrue($mbox->append(
+            $zero
+        ));
+
+        //still 12
+        $this->assertEquals(12, $mbox->size());
+
+        $this->assertTrue($mbox->open());
+        $this->assertEquals(15, $mbox->size());
+
+        $this->assertContains('My own hands', $mbox->get(12));
+        $this->assertContains('My own hands', $mbox->get(13));
+        $this->assertContains('My own hands', $mbox->get(14));
+    }
+
+    /**
      * Moves a file
      */
     public function test_move() {
