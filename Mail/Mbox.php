@@ -480,6 +480,7 @@ class Mail_Mbox extends PEAR
             );
         }
 
+        // optimize insert() to use append whenever possible
         if ($offset < 0 || $offset == $this->size() || $this->size() == 0) {
             return $this->append($content);
         }
