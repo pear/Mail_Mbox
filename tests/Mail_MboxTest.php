@@ -1,11 +1,11 @@
 <?php
 // Call Mail_MboxTest::main() if this source file is executed directly.
-if (!defined("PHPUnit2_MAIN_METHOD")) {
-    define("PHPUnit2_MAIN_METHOD", "Mail_MboxTest::main");
+if (!defined("PHPUnit_MAIN_METHOD")) {
+    define("PHPUnit_MAIN_METHOD", "Mail_MboxTest::main");
 }
 
-require_once "PHPUnit2/Framework/TestCase.php";
-require_once "PHPUnit2/Framework/TestSuite.php";
+require_once "PHPUnit/Framework/TestCase.php";
+require_once "PHPUnit/Framework/TestSuite.php";
 
 require_once "Mail/Mbox.php";
 
@@ -14,7 +14,7 @@ require_once "Mail/Mbox.php";
  *
  * @author Christian Weiske <cweiske@php.net>
  */
-class Mail_MboxTest extends PHPUnit2_Framework_TestCase {
+class Mail_MboxTest extends PHPUnit_Framework_TestCase {
 
     protected static $file = null;
     protected static $filecopy = null;
@@ -26,9 +26,9 @@ class Mail_MboxTest extends PHPUnit2_Framework_TestCase {
      * @static
      */
     public static function main() {
-        require_once "PHPUnit2/TextUI/TestRunner.php";
-        $suite  = new PHPUnit2_Framework_TestSuite("Mail_MboxTest");
-        $result = PHPUnit2_TextUI_TestRunner::run($suite);
+        require_once "PHPUnit/TextUI/TestRunner.php";
+        $suite  = new PHPUnit_Framework_TestSuite("Mail_MboxTest");
+        $result = PHPUnit_TextUI_TestRunner::run($suite);
     }
 
     /**
@@ -362,7 +362,7 @@ class Mail_MboxTest extends PHPUnit2_Framework_TestCase {
 }
 
 // Call Mail_MboxTest::main() if this source file is executed directly.
-if (PHPUnit2_MAIN_METHOD == "Mail_MboxTest::main") {
+if (PHPUnit_MAIN_METHOD == "Mail_MboxTest::main") {
     Mail_MboxTest::main();
 }
 ?>
