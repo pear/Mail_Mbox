@@ -38,6 +38,7 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase {
      * @access protected
      */
     protected function setUp() {
+        chdir(dirname(__FILE__) . '/../');
         Mail_MboxTest::$file     = dirname(__FILE__) . '/testbox';
         Mail_MboxTest::$filecopy = tempnam('/tmp', 'Mail_MboxTestcopy');
 
