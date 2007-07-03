@@ -1,6 +1,6 @@
 <?php
 if (!defined('PHPUnit_MAIN_METHOD')) {
-    define('PHPUnit_MAIN_METHOD', 'AllTests::main');
+    define('PHPUnit_MAIN_METHOD', 'Mail_Mbox_AllTests::main');
 }
 
 require_once 'PHPUnit/Framework/TestSuite.php';
@@ -10,7 +10,7 @@ require_once 'PHPUnit/TextUI/TestRunner.php';
 require_once 'Mail_MboxTest.php';
 
 
-class AllTests
+class Mail_Mbox_AllTests
 {
     public static function main()
     {
@@ -27,7 +27,7 @@ class AllTests
     }
 }
 
-if (PHPUnit_MAIN_METHOD == 'AllTests::main') {
-    AllTests::main();
+if (PHPUnit_MAIN_METHOD == 'Mail_Mbox_AllTests::main') {
+    Mail_Mbox_AllTests::main();
 }
 ?>
