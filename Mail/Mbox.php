@@ -1,69 +1,70 @@
 <?php
 /**
-*   Class to read mbox mail files.
+* Class to read mbox mail files.
 *
-*   @category   Mail
-*   @package    Mail_Mbox
-*   @author     Roberto Berto <darkelder@php.net>
-*   @author     Christian Weiske <cweiske@php.net>
-*   @license    LGPL
-*   @version    CVS: $Id$
+* @category Mail
+* @package  Mail_Mbox
+* @author   Roberto Berto <darkelder@php.net>
+* @author   Christian Weiske <cweiske@php.net>
+* @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+* @version  CVS: $Id$
+* @link     http://pear.php.net/package/Mail_Mbox
 */
 require_once 'PEAR.php';
 
 /**
-*   The file has been modified since it has been opened.
-*   You should close and re-open it.
+* The file has been modified since it has been opened.
+* You should close and re-open it.
 */
 define('MAIL_MBOX_ERROR_MODIFIED'            , 2101);
 
 /**
-*   The mail mbox file doesn't exist.
+* The mail mbox file doesn't exist.
 */
 define('MAIL_MBOX_ERROR_FILE_NOT_EXISTING'   , 2102);
 
 /**
-*   There is no message with the given number.
+* There is no message with the given number.
 */
 define('MAIL_MBOX_ERROR_MESSAGE_NOT_EXISTING', 2103);
 
 /**
-*   No permission to access the file.
+* No permission to access the file.
 */
 define('MAIL_MBOX_ERROR_NO_PERMISSION'       , 2104);
 
 /**
-*   The file cannot be opened.
+* The file cannot be opened.
 */
 define('MAIL_MBOX_ERROR_CANNOT_OPEN'         , 2105);
 
 /**
-*   The file cannot be closed due to some strange things.
+* The file cannot be closed due to some strange things.
 */
 define('MAIL_MBOX_ERROR_CANNOT_CLOSE'        , 2106);
 
 /**
-*   The file cannot be read.
+* The file cannot be read.
 */
 define('MAIL_MBOX_ERROR_CANNOT_READ'         , 2107);
 
 /**
-*   Failed to create a temporary file.
+* Failed to create a temporary file.
 */
 define('MAIL_MBOX_ERROR_CANNOT_CREATE_TMP'   , 2108);
 
 /**
-*   The file cannot be written.
+* The file cannot be written.
 */
 define('MAIL_MBOX_ERROR_CANNOT_WRITE'        , 2109);
 
 /**
-*   The file is not open.
+* The file is not open.
 */
 define('MAIL_MBOX_ERROR_NOT_OPEN'            , 2110);
 
 /**
-*   The resource isn't valid anymore.
+* The resource isn't valid anymore.
 */
 define('MAIL_MBOX_ERROR_NO_RESOURCE'         , 2111);
 
@@ -71,37 +72,38 @@ define('MAIL_MBOX_ERROR_NO_RESOURCE'         , 2111);
 
 
 /**
-*   Class to read mbox mail files.
+* Class to read mbox mail files.
 *
-*   An mbox mail file is contains plain emails concatenated in one
-*   big file. Since each mail starts with "From ", and ends with a newline,
-*   they can be separated from each other.
+* An mbox mail file is contains plain emails concatenated in one
+* big file. Since each mail starts with "From ", and ends with a newline,
+* they can be separated from each other.
 *
-*   This class takes a mbox filename in the constructor, generates an
-*   index where the mails start and end when calling open() and returns
-*   single mails with get(), using the positions in the index.
+* This class takes a mbox filename in the constructor, generates an
+* index where the mails start and end when calling open() and returns
+* single mails with get(), using the positions in the index.
 *
-*   With the help of this class, you also can add(), remove() and update()
-*   messages in the mbox file. When calling one of this methods, the class
-*   checks if the file has been modified since the index was created -
-*   changing the file with the wrong positions in the index would very likely
-*   corrupt it.
-*   This check is not done when retrieving single messages via get(), as this
-*   would slow down the process if you retrieve thousands of mails. You can,
-*   however, call hasBeenModified() before using get() to check for modification
-*   yourself. If the method returns true, you should close() and re-open() the
-*   file.
+* With the help of this class, you also can add(), remove() and update()
+* messages in the mbox file. When calling one of this methods, the class
+* checks if the file has been modified since the index was created -
+* changing the file with the wrong positions in the index would very likely
+* corrupt it.
+* This check is not done when retrieving single messages via get(), as this
+* would slow down the process if you retrieve thousands of mails. You can,
+* however, call hasBeenModified() before using get() to check for modification
+* yourself. If the method returns true, you should close() and re-open() the
+* file.
 *
-*   If something strange happens and you don't know why, activate debugging with
-*   setDebug(true). You also can modify the temporary directory in which changed
-*   mboxes are stored when adding/removing/modifying by using setTmpDir('/path/');
+* If something strange happens and you don't know why, activate debugging with
+* setDebug(true). You also can modify the temporary directory in which changed
+* mboxes are stored when adding/removing/modifying by using setTmpDir('/path/');
 *
-*   @category   Mail
-*   @package    Mail_Mbox
-*   @author     Roberto Berto <darkelder@php.net>
-*   @author     Christian Weiske <cweiske@php.net>
-*   @license    LGPL
-*   @version    CVS: $Id$
+* @category Mail
+* @package  Mail_Mbox
+* @author   Roberto Berto <darkelder@php.net>
+* @author   Christian Weiske <cweiske@php.net>
+* @license  http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+* @version  CVS: $Id$
+* @link     http://pear.php.net/package/Mail_Mbox
 */
 class Mail_Mbox extends PEAR
 {
@@ -174,7 +176,8 @@ class Mail_Mbox extends PEAR
      * Create a new Mbox class instance.
      * After creating it, you should use open().
      *
-     * @param string $file  Filename to open.
+     * @param string $file Filename to open.
+     *
      * @access public
      */
     function Mail_Mbox($file)
@@ -195,14 +198,15 @@ class Mail_Mbox extends PEAR
         // check if file exists else return pear error
         if (!file_exists($this->_file)) {
             return PEAR::raiseError(
-                'Cannot open the mbox file "' . $this->_file . '": file does not exist.',
+                'Cannot open the mbox file "'
+                . $this->_file . '": file does not exist.',
                 MAIL_MBOX_ERROR_FILE_NOT_EXISTING
             );
         }
 
         // opening the file
         $this->_lastModified = filemtime($this->_file);
-        $this->_resource = fopen($this->_file, 'r');
+        $this->_resource     = fopen($this->_file, 'r');
         if (!is_resource($this->_resource)) {
             return PEAR::raiseError(
                 'Cannot open the mbox file: maybe without permission.',
@@ -221,8 +225,8 @@ class Mail_Mbox extends PEAR
      * Used by other methods to be able to be able to prevent 
      * re-opening the file.
      *
-     * @return mixed  See open() for return values. Returns true if
-     *                  $this->autoReopen is false.
+     * @return mixed See open() for return values. Returns true if
+     *               $this->autoReopen is false.
      * @access protected
      */
     function _reopen()
@@ -238,8 +242,8 @@ class Mail_Mbox extends PEAR
      *
      * Close the Mbox file opened by open()
      *
-     * @return   mixed       true on success, else PEAR_Error
-     * @access   public
+     * @return mixed true on success, else PEAR_Error
+     * @access public
      */
     function close()
     {
@@ -263,9 +267,9 @@ class Mail_Mbox extends PEAR
     /**
      * Get number of messages in this mbox
      *
-     * @return   int                 Number of messages on Mbox (starting on 1,
-     *                               0 if no message exists)
-     * @access   public
+     * @return int Number of messages on Mbox (starting on 1,
+     *             0 if no message exists)
+     * @access public
      */
     function size()
     {
@@ -281,9 +285,10 @@ class Mail_Mbox extends PEAR
      *
      * Note: Message number start from 0.
      *
-     * @param    int $message        The number of Message
-     * @return   string              Return the message, PEAR_Error on error
-     * @access   public
+     * @param int $message The number of Message
+     *
+     * @return string Return the message, PEAR_Error on error
+     * @access public
      */
     function get($message)
     {
@@ -320,7 +325,8 @@ class Mail_Mbox extends PEAR
         }
 
         if ($bytesEnd - $bytesStart > 0) {
-            // reading and returning message (bytes to read = difference of bytes locations)
+            // reading and returning message
+            // (bytes to read = difference of bytes locations)
             $msg = fread($this->_resource, $bytesEnd - $bytesStart) . "\n";
             return $msg;
         }
@@ -331,10 +337,11 @@ class Mail_Mbox extends PEAR
      *
      * Note: messages start with 0.
      *
-     * @param    int $message        The number of the message to remove, or
-     *                               array of message ids to remove
-     * @return   mixed               Return true else PEAR_Error
-     * @access   public
+     * @param int $message The number of the message to remove, or
+     *                     array of message ids to remove
+     *
+     * @return mixed Return true else PEAR_Error
+     * @access public
      */
     function remove($message)
     {
@@ -361,13 +368,13 @@ class Mail_Mbox extends PEAR
         }
 
         // changing umask for security reasons
-        $umaskOld   = umask(077);
+        $umaskOld = umask(077);
         // creating temp file
-        $ftempname  = tempnam($this->tmpdir, 'Mail_Mbox');
+        $ftempname = tempnam($this->tmpdir, 'Mail_Mbox');
         // returning to old umask
         umask($umaskOld);
 
-        $ftemp      = fopen($ftempname, 'w');
+        $ftemp = fopen($ftempname, 'w');
         if ($ftemp === false) {
             return PEAR::raiseError(
                 'Cannot create a temp file "' . $ftempname . '".',
@@ -403,10 +410,11 @@ class Mail_Mbox extends PEAR
      *
      * Note: messages start with 0.
      *
-     * @param    int $message        The number of Message to updated
-     * @param    string $content     The new content of the Message
-     * @return   mixed               Return true if all is ok, else PEAR_Error
-     * @access   public
+     * @param int    $message The number of Message to updated
+     * @param string $content The new content of the Message
+     *
+     * @return mixed Return true if all is ok, else PEAR_Error
+     * @access public
      */
     function update($message, $content)
     {
@@ -426,8 +434,8 @@ class Mail_Mbox extends PEAR
         }
 
         // creating temp file
-        $ftempname  = tempnam($this->tmpdir, 'Mail_Mbox');
-        $ftemp      = fopen($ftempname, 'w');
+        $ftempname = tempnam($this->tmpdir, 'Mail_Mbox');
+        $ftemp     = fopen($ftempname, 'w');
         if ($ftemp === false) {
             return PEAR::raiseError(
                 'Cannot create temp file "' . $ftempname . '" .',
@@ -466,10 +474,11 @@ class Mail_Mbox extends PEAR
      *
      * Note: PEAR::Mail_Mbox auto adds \n\n at end of the message
      *
-     * @param    string $content     The content of the new message
-     * @param    int offset          Before the offset. Default: last message (null)
-     * @return   mixed               Return true else pear error class
-     * @access   public
+     * @param string $content The content of the new message
+     * @param int    $offset  Before the offset. Default: last message (null)
+     *
+     * @return mixed Return true else pear error class
+     * @access public
      */
     function insert($content, $offset = null)
     {
@@ -486,8 +495,8 @@ class Mail_Mbox extends PEAR
         }
 
         // creating temp file
-        $ftempname  = tempnam($this->tmpdir, 'Mail_Mbox');
-        $ftemp = fopen($ftempname, 'w');
+        $ftempname = tempnam($this->tmpdir, 'Mail_Mbox');
+        $ftemp     = fopen($ftempname, 'w');
         if ($ftemp === false) {
             return PEAR::raiseError(
                 'Cannot create temp file "' . $ftempname . '".',
@@ -502,7 +511,7 @@ class Mail_Mbox extends PEAR
         if ($messages == 0 && $offset !== null) {
             fwrite($ftemp, $content, strlen($content));
         } else {
-            for ($x = 0; $x < $messages; $x++)  {
+            for ($x = 0; $x < $messages; $x++) {
                 if ($offset !== null && $x == $offset) {
                     fwrite($ftemp, $content, strlen($content));
                 }
@@ -532,9 +541,10 @@ class Mail_Mbox extends PEAR
      *
      * Note: PEAR::Mail_Mbox auto adds \n\n at end of the message
      *
-     * @param    string $content     The content of the new message
-     * @return   mixed               Return true else PEAR_Error object
-     * @access   public
+     * @param string $content The content of the new message
+     *
+     * @return mixed Return true else PEAR_Error object
+     * @access public
      */
     function append($content)
     {
@@ -564,10 +574,11 @@ class Mail_Mbox extends PEAR
      *
      * Used internally to move the content of the temp file to the mbox file.
      * Note that we can't use rename() internally, as it behaves very, very
-     *   strange on windows.
+     * strange on windows.
      *
-     * @param    string $ftempname   Source file - will be removed
-     * @param    string $filename    Output file
+     * @param string $ftempname Source file - will be removed
+     * @param string $filename  Output file
+     *
      * @access   protected
      */
     function _move($ftempname, $filename)
@@ -591,7 +602,7 @@ class Mail_Mbox extends PEAR
      *
      * - Get start bytes and end bytes of each messages
      *
-     * @access   protected
+     * @access protected
      */
     function _process()
     {
@@ -614,9 +625,9 @@ class Mail_Mbox extends PEAR
         }
 
         // current start byte position
-        $start      = 0;
+        $start = 0;
         // last start byte position
-        $laststart  = 0;
+        $laststart = 0;
         // there aren't any message
         $hasmessage = false;
 
@@ -624,10 +635,10 @@ class Mail_Mbox extends PEAR
             // if line start with "From ", it is a new message
             if (0 === strncmp($line, 'From ', 5)) {
                 // save last start byte position
-                $laststart  = $start;
+                $laststart = $start;
 
                 // new start byte position is the start of the line 
-                $start      = ftell($this->_resource) - strlen($line);
+                $start = ftell($this->_resource) - strlen($line);
 
                 // if it is not the first message add message positions
                 if ($start > 0) {
@@ -668,10 +679,13 @@ class Mail_Mbox extends PEAR
 
     /**
      * Set the directory for temporary files.
-     * @see Mail_Mbox::$tmpdir
      *
-     * @param string $tmpdir    The new temporary directory
-     * @return mixed  true if all is ok, PEAR_Error if $tmpdir is a dir but not writable
+     * @param string $tmpdir The new temporary directory
+     *
+     * @return mixed  True if all is ok, PEAR_Error if $tmpdir
+     *                is a dir but not writable
+     *
+     * @see Mail_Mbox::$tmpdir
      */
     function setTmpDir($tmpdir)
     {
@@ -689,7 +703,7 @@ class Mail_Mbox extends PEAR
     /**
      * Returns the temporary directory
      *
-     * @return string   The temporary directory
+     * @return string The temporary directory
      */
     function getTmpDir()
     {
@@ -698,9 +712,10 @@ class Mail_Mbox extends PEAR
 
     /**
      * Set the debug flag
-     * @see Mail_Mbox::$debug
      *
-     * @param bool $debug    If debug is on or off
+     * @param bool $debug If debug is on or off
+     *
+     * @see Mail_Mbox::$debug
      */
     function setDebug($debug)
     {
@@ -709,9 +724,10 @@ class Mail_Mbox extends PEAR
 
     /**
      * Returns the debug flag setting
+     *
      * @see Mail_Mbox::$debug
      *
-     * @return bool  If debug is enabled.
+     * @return bool If debug is enabled.
      */
     function getDebug()
     {
@@ -721,9 +737,10 @@ class Mail_Mbox extends PEAR
     /**
      * Sets if the mbox is reloaded after modification
      * automatically.
-     * @see Mail_Mbox::$autoReopen
      *
-     * @param bool $autoReopen  If the mbox is reloaded automatically
+     * @param bool $autoReopen If the mbox is reloaded automatically
+     *
+     * @see Mail_Mbox::$autoReopen
      */
     function setAutoReopen($autoReopen)
     {
@@ -732,9 +749,10 @@ class Mail_Mbox extends PEAR
 
     /**
      * Returns the automatically reopening setting
-     * @see Mail_Mbox::$autoReopen
      *
-     * @return bool  If the mbox is reloaded automatically.
+     * @return bool If the mbox is reloaded automatically.
+     *
+     * @see Mail_Mbox::$autoReopen
      */
     function getAutoReopen()
     {
