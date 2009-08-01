@@ -181,6 +181,19 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Insert and invalid message
+     */
+    public function testInsertInvalid() {
+        $this->copy();
+        $mbox = new Mail_Mbox(Mail_MboxTest::$filecopy);
+        $this->assertTrue($mbox->open());
+
+        $err = $mbox->insert('this is not valid', 0);
+        $this->assertType('PEAR_Error', $err);
+        $this->assertEquals(MAIL_MBOX_ERROR_MSG_INVALID, $err->getCode());
+    }
+
+    /**
      * Append an email to the end of the thingy
      */
     public function testAppend() {
@@ -209,6 +222,19 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase {
         $this->assertContains('My own hands', $mbox->get(12));
         $this->assertContains('My own hands', $mbox->get(13));
         $this->assertContains('My own hands', $mbox->get(14));
+    }
+
+    /**
+     * Append an invalid message
+     */
+    public function testAppendInvalid() {
+        $this->copy();
+        $mbox = new Mail_Mbox(Mail_MboxTest::$filecopy);
+        $this->assertTrue($mbox->open());
+
+        $err = $mbox->append('this is invalid');
+        $this->assertType('PEAR_Error', $err);
+        $this->assertEquals(MAIL_MBOX_ERROR_MSG_INVALID, $err->getCode());
     }
 
     /**
@@ -254,6 +280,19 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase {
         $this->assertContains('My own hands', $mbox->get(12));
         $this->assertContains('My own hands', $mbox->get(13));
         $this->assertContains('My own hands', $mbox->get(14));
+    }
+
+    /**
+     * Update to an invalid message
+     */
+    public function testUpdateInvalid() {
+        $this->copy();
+        $mbox = new Mail_Mbox(Mail_MboxTest::$filecopy);
+        $this->assertTrue($mbox->open());
+
+        $err = $mbox->update(0, 'this is invalid');
+        $this->assertType('PEAR_Error', $err);
+        $this->assertEquals(MAIL_MBOX_ERROR_MSG_INVALID, $err->getCode());
     }
 
     /**
@@ -303,11 +342,11 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase {
         $this->assertType('PEAR_Error', $err);
         $this->assertEquals(MAIL_MBOX_ERROR_MODIFIED, $err->getCode());
 
-        $err = $mbox->insert('Test');
+        $err = $mbox->insert('From Test');
         $this->assertType('PEAR_Error', $err);
         $this->assertEquals(MAIL_MBOX_ERROR_MODIFIED, $err->getCode());
 
-        $err = $mbox->update(0, 'Test');
+        $err = $mbox->update(0, 'From Test');
         $this->assertType('PEAR_Error', $err);
         $this->assertEquals(MAIL_MBOX_ERROR_MODIFIED, $err->getCode());
 

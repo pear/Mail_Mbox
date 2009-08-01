@@ -70,6 +70,11 @@ define('MAIL_MBOX_ERROR_NOT_OPEN', 2110);
 */
 define('MAIL_MBOX_ERROR_NO_RESOURCE', 2111);
 
+/**
+* Message is invalid and would trash the file
+*/
+define('MAIL_MBOX_ERROR_MSG_INVALID', 2112);
+
 
 
 
@@ -412,7 +417,7 @@ class Mail_Mbox extends PEAR
      *
      * Note: messages start with 0.
      *
-     * @param int    $message The number of Message to updated
+     * @param int    $message The number of Message to update
      * @param string $content The new content of the Message
      *
      * @return mixed Return true if all is ok, else PEAR_Error
@@ -420,6 +425,12 @@ class Mail_Mbox extends PEAR
      */
     function update($message, $content)
     {
+        if (!$this->_isValid($content)) {
+            return PEAR::raiseError(
+                'Message is invalid', MAIL_MBOX_ERROR_MSG_INVALID
+            );
+        }
+
         if ($this->hasBeenModified()) {
             return PEAR::raiseError(
                 'File has been modified since loading. Re-open the file.',
@@ -484,6 +495,12 @@ class Mail_Mbox extends PEAR
      */
     function insert($content, $offset = null)
     {
+        if (!$this->_isValid($content)) {
+            return PEAR::raiseError(
+                'Message is invalid', MAIL_MBOX_ERROR_MSG_INVALID
+            );
+        }
+
         if ($this->hasBeenModified()) {
             return PEAR::raiseError(
                 'File has been modified since loading. Re-open the file.',
@@ -550,6 +567,12 @@ class Mail_Mbox extends PEAR
      */
     function append($content)
     {
+        if (!$this->_isValid($content)) {
+            return PEAR::raiseError(
+                'Message is invalid', MAIL_MBOX_ERROR_MSG_INVALID
+            );
+        }
+
         $this->close();
         $content .= "\n\n";
 
@@ -569,6 +592,24 @@ class Mail_Mbox extends PEAR
         }
 
         return $this->_reopen();
+    }
+
+    /**
+     * Checks if the given message is valid.
+     * If it was invalid and we'd add it to the file,
+     * it would get unreadable
+     *
+     * @param string $content Message to be added or updated
+     *
+     * @return boolean True if it is valid, false if not
+     */
+    function _isValid($content)
+    {
+        if (substr($content, 0, 5) != 'From ') {
+            return false;
+        }
+        //Todo: check for two newlines?
+        return true;
     }
 
     /**
