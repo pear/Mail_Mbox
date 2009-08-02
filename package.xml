@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.4.8" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package version="2.0"
+ xmlns="http://pear.php.net/dtd/package-2.0"
+ xmlns:tasks="http://pear.php.net/dtd/tasks-1.0"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+  http://pear.php.net/dtd/tasks-1.0.xsd
+  http://pear.php.net/dtd/package-2.0
+  http://pear.php.net/dtd/package-2.0.xsd"
+>
  <name>Mail_Mbox</name>
  <channel>pear.php.net</channel>
  <summary>Read and modify Unix MBOXes</summary>
@@ -21,10 +29,10 @@
   <active>yes</active>
 </lead>
 
- <date>2006-08-01</date>
+ <date>2009-08-02</date>
 
  <version>
-  <release>0.5.1</release>
+  <release>0.5.2</release>
   <api>0.5.1</api>
  </version>
  <stability>
@@ -35,17 +43,15 @@
  <license uri="http://www.gnu.org/licenses/lgpl.html">LGPL</license>
 
  <notes>
-  - Use copy/unlink internally instead of copying the file bit-by-bit
-  - Added append() method since it's faster than the old insert()
-  - Added autoReload property to make adding many messages faster
+  - Fix bug #15559: Inserting new message to a Mbox is not guaranteed to produce a valid Mbox [cweiske]
  </notes>
 
  <contents>
-  <dir name="/" baseinstalldir="/">
+  <dir name="/">
     <dir name="Mail">
       <file name="Mbox.php" role="php"/>
     </dir>
-    <dir name="examples" baseinstalldir="Mail_Mbox">
+    <dir name="examples">
       <file name="demobox" role="doc"/>
       <file name="mimedecode.php" role="doc"/>
       <file name="modify.php" role="doc"/>
@@ -63,7 +69,6 @@
   <required>
    <php>
     <min>4.3.3</min>
-    <max>6.0.0</max>
    </php>
    <pearinstaller>
     <min>1.4.1</min>
@@ -73,6 +78,21 @@
  <phprelease />
 
  <changelog>
+
+  <release>
+   <version>
+    <release>0.5.2</release>
+    <api>0.5.1</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2009-08-02</date>
+   <notes>
+    - Fix bug #15559: Inserting new message to a Mbox is not guaranteed to produce a valid Mbox [cweiske]
+    </notes>
+  </release>
 
   <release>
    <version>
