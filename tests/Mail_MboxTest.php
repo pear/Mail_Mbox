@@ -395,6 +395,28 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($this->mbox->getDebug());
     }
 
+    public function testBug16487()
+    {
+        //file does not exist yet
+        $file = tempnam(sys_get_temp_dir(), 'mail_mbox');
+        unlink($file);
+        $mbox = new Mail_Mbox($file);
+        //open without parameter does not create anything
+        $err = $mbox->open();
+        $this->assertType('PEAR_Error', $err);
+        $this->assertEquals(
+            MAIL_MBOX_ERROR_FILE_NOT_EXISTING, $err->getCode()
+        );
+
+        //with true as first parameter the file gets created
+        $err = $mbox->open(true);
+        $this->assertTrue($err);
+        $mbox->insert('From someone who loves you');
+        $mbox->close();
+
+        $this->assertFileExists($file);
+        unlink($file);
+    }
 
     protected function copy()
     {

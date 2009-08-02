@@ -200,15 +200,22 @@ class Mail_Mbox extends PEAR
      * @return boolean|PEAR_Error True if all went ok, PEAR_Error on failure
      * @access public
      */
-    function open()
+    function open($create = false)
     {
         // check if file exists else return pear error
         if (!file_exists($this->_file)) {
-            return PEAR::raiseError(
-                'Cannot open the mbox file "'
-                . $this->_file . '": file does not exist.',
-                MAIL_MBOX_ERROR_FILE_NOT_EXISTING
-            );
+            if ($create) {
+                $ret = $this->_create();
+                if (PEAR::isError($ret)) {
+                    return $ret;
+                }
+            } else {
+                return PEAR::raiseError(
+                    'Cannot open the mbox file "'
+                    . $this->_file . '": file does not exist.',
+                    MAIL_MBOX_ERROR_FILE_NOT_EXISTING
+                );
+            }
         }
 
         // opening the file
@@ -225,6 +232,36 @@ class Mail_Mbox extends PEAR
         $this->_process();
 
         return true;
+    }
+
+    /**
+     * Creates the file
+     *
+     * @return boolean True if it was created, false if it already
+     *                 existed. PEAR_Error in case it could not
+     *                 be created.
+     *
+     * @access protected
+     */
+    function _create()
+    {
+        if (file_exists($this->_file)) {
+            return false;
+        }
+
+        //We should maybe try to check if the directory
+        // is writable here. But that's too much fuss for now.
+        touch($this->_file);
+
+        if (file_exists($this->_file)) {
+            return true;
+        }
+
+        //error
+        return PEAR::raiseError(
+            'File could not be created',
+            MAIL_MBOX_ERROR_CANNOT_WRITE
+        );
     }
 
     /**

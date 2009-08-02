@@ -32,8 +32,8 @@
  <date>2009-08-02</date>
 
  <version>
-  <release>0.5.2</release>
-  <api>0.5.1</api>
+  <release>0.6.0</release>
+  <api>0.6.0</api>
  </version>
  <stability>
   <release>beta</release>
@@ -43,7 +43,7 @@
  <license uri="http://www.gnu.org/licenses/lgpl.html">LGPL</license>
 
  <notes>
-  - Fix bug #15559: Inserting new message to a Mbox is not guaranteed to produce a valid Mbox [cweiske]
+  - Implement request #16487: Insert on new box throws warning [cweiske]
  </notes>
 
  <contents>
@@ -78,6 +78,21 @@
  <phprelease />
 
  <changelog>
+
+  <release>
+   <version>
+    <release>0.6.0</release>
+    <api>0.6.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2009-08-02</date>
+   <notes>
+    - Implement request #16487: Insert on new box throws warning [cweiske]
+   </notes>
+  </release>
 
   <release>
    <version>
