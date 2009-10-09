@@ -203,7 +203,7 @@ class Mail_Mbox extends PEAR
     function open($create = false)
     {
         // check if file exists else return pear error
-        if (!file_exists($this->_file)) {
+        if (!is_file($this->_file)) {
             if ($create) {
                 $ret = $this->_create();
                 if (PEAR::isError($ret)) {
@@ -245,7 +245,7 @@ class Mail_Mbox extends PEAR
      */
     function _create()
     {
-        if (file_exists($this->_file)) {
+        if (is_file($this->_file)) {
             return false;
         }
 
@@ -253,7 +253,7 @@ class Mail_Mbox extends PEAR
         // is writable here. But that's too much fuss for now.
         touch($this->_file);
 
-        if (file_exists($this->_file)) {
+        if (is_file($this->_file)) {
             return true;
         }
 
