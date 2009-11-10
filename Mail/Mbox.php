@@ -104,12 +104,16 @@ define('MAIL_MBOX_ERROR_MSG_INVALID', 2112);
 * setDebug(true). You also can modify the temporary directory in which changed
 * mboxes are stored when adding/removing/modifying by using setTmpDir('/path/');
 *
+* See @link tags for specifications.
+*
 * @category Mail
 * @package  Mail_Mbox
 * @author   Roberto Berto <darkelder@php.net>
 * @author   Christian Weiske <cweiske@php.net>
 * @license  http://www.gnu.org/copyleft/lesser.html LGPL License 2.1
 * @link     http://pear.php.net/package/Mail_Mbox
+* @link http://en.wikipedia.org/wiki/Mbox
+* @link http://www.qmail.org/man/man5/mbox.html
 */
 class Mail_Mbox extends PEAR
 {
@@ -368,12 +372,17 @@ class Mail_Mbox extends PEAR
             );
         }
 
-        if ($bytesEnd - $bytesStart > 0) {
-            // reading and returning message
-            // (bytes to read = difference of bytes locations)
-            $msg = fread($this->_resource, $bytesEnd - $bytesStart) . "\n";
-            return $msg;
+        if ($bytesEnd - $bytesStart <= 0) {
+            return PEAR::raiseError(
+                'Message byte length is negative',
+                MAIL_MBOX_ERROR_CANNOT_READ
+            );
         }
+
+        // reading and returning message
+        // (bytes to read = difference of bytes locations)
+        $msg = fread($this->_resource, $bytesEnd - $bytesStart);
+        return $this->_unescapeMessage($msg);
     }
 
     /**
@@ -403,7 +412,9 @@ class Mail_Mbox extends PEAR
 
         // checking if we have bytes locations for this message
         foreach ($message as $msg) {
-            if (!isset($this->_index[$msg]) || !is_array($this->_index[$msg])) {
+            if (!isset($this->_index[$msg])
+                || !is_array($this->_index[$msg])
+            ) {
                 return PEAR::raiseError(
                     'Message ' . $msg . 'does not exist.',
                     MAIL_MBOX_ERROR_MESSAGE_NOT_EXISTING
@@ -434,7 +445,7 @@ class Mail_Mbox extends PEAR
                 continue;
             }
 
-            $messageThis = $this->get($x);
+            $messageThis = $this->_escapeMessage($this->get($x));
             if (is_string($messageThis)) {
                 fwrite($ftemp, $messageThis, strlen($messageThis));
             }
@@ -449,8 +460,6 @@ class Mail_Mbox extends PEAR
 
     /**
      * Update a message
-     *
-     * Note: Mail_Mbox auto adds \n\n at end of the message
      *
      * Note: messages start with 0.
      *
@@ -497,12 +506,13 @@ class Mail_Mbox extends PEAR
 
         for ($x = 0; $x < $messages; $x++) {
             if ($x == $message) {
-                $messageThis = $content . "\n\n";
+                $messageThis = $content;
             } else {
                 $messageThis = $this->get($x);
             }
 
             if (is_string($messageThis)) {
+                $messageThis = $this->_escapeMessage($messageThis);
                 fwrite($ftemp, $messageThis, strlen($messageThis));
             }
         }
@@ -521,8 +531,6 @@ class Mail_Mbox extends PEAR
      * 0 means before the actual message 0. 3 means before the message 3
      * (Remember: message 3 is the fourth message). The default is put
      * AFTER the last message (offset = null).
-     *
-     * Note: PEAR::Mail_Mbox auto adds \n\n at end of the message
      *
      * @param string $content The content of the new message
      * @param int    $offset  Before the offset. Default: last message (null)
@@ -562,7 +570,7 @@ class Mail_Mbox extends PEAR
 
         // writing only undeleted messages
         $messages = $this->size();
-        $content .= "\n\n";
+        $content = $this->_escapeMessage($content);
 
         if ($messages == 0 && $offset !== null) {
             fwrite($ftemp, $content, strlen($content));
@@ -571,7 +579,7 @@ class Mail_Mbox extends PEAR
                 if ($offset !== null && $x == $offset) {
                     fwrite($ftemp, $content, strlen($content));
                 }
-                $messageThis = $this->get($x);
+                $messageThis = $this->_escapeMessage($this->get($x));
 
                 if (is_string($messageThis)) {
                     fwrite($ftemp, $messageThis, strlen($messageThis));
@@ -595,8 +603,6 @@ class Mail_Mbox extends PEAR
      *
      * This method is also used by insert() since it's faster.
      *
-     * Note: PEAR::Mail_Mbox auto adds \n\n at end of the message
-     *
      * @param string $content The content of the new message
      *
      * @return mixed Return true else PEAR_Error object
@@ -611,7 +617,7 @@ class Mail_Mbox extends PEAR
         }
 
         $this->close();
-        $content .= "\n\n";
+        $content = $this->_escapeMessage($content);
 
         $fp = fopen($this->_file, 'a');
         if ($fp === false) {
@@ -740,6 +746,52 @@ class Mail_Mbox extends PEAR
         }
 
         return true;
+    }
+
+    /**
+     * Quotes "From " lines in the midst of the message.
+     * And quoted "From " lines, too :)
+     * Also appends the trailing newline.
+     * After escaping, the message can be written to file.
+     *
+     * @param string $message Message content
+     *
+     * @return string Escaped message
+     *
+     * @access protected
+     * @see    _unescapeMessage()
+     */
+    function _escapeMessage($message)
+    {
+        if (substr($message, -1) == "\n") {
+            $message .= "\n";
+        } else {
+            $message .= "\n\n";
+        }
+        return 'F' . preg_replace(
+            '/([>]*From )/',
+            '>$1',
+            substr($message, 1)
+        );
+    }
+
+    /**
+     * Removes quoted "From " lines from the message
+     *
+     * @param string $message Message content
+     *
+     * @return string Unescaped message
+     *
+     * @access protected
+     * @see    _escapeMessage()
+     */
+    function _unescapeMessage($message)
+    {
+        return preg_replace(
+            '/>([>]*From )/',
+            '$1',
+            substr($message, 0, -1)
+        );
     }
 
     /**

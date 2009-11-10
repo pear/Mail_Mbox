@@ -4,8 +4,7 @@ if (!defined("PHPUnit_MAIN_METHOD")) {
     define("PHPUnit_MAIN_METHOD", "Mail_MboxTest::main");
 }
 
-require_once "PHPUnit/Framework/TestCase.php";
-require_once "PHPUnit/Framework/TestSuite.php";
+require_once 'PHPUnit/Framework.php';
 
 //make cvs testing work
 chdir(dirname(__FILE__) . '/../');
@@ -16,7 +15,8 @@ require_once "Mail/Mbox.php";
  *
  * @author Christian Weiske <cweiske@php.net>
  */
-class Mail_MboxTest extends PHPUnit_Framework_TestCase {
+class Mail_MboxTest extends PHPUnit_Framework_TestCase
+{
 
     protected static $file = null;
     protected static $filecopy = null;
@@ -28,8 +28,8 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase {
      * @static
      */
     public static function main() {
-        require_once "PHPUnit/TextUI/TestRunner.php";
-        $suite  = new PHPUnit_Framework_TestSuite("Mail_MboxTest");
+        require_once 'PHPUnit/TextUI/TestRunner.php';
+        $suite  = new PHPUnit_Framework_TestSuite('Mail_MboxTest');
         $result = PHPUnit_TextUI_TestRunner::run($suite);
     }
 
@@ -418,6 +418,44 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase {
         unlink($file);
     }
 
+    /**
+     * While the bug was incorrect, it showed that we do not
+     * escape messages properly.
+     * Here we test that escaped messages are stored and read
+     * properly.
+     *
+     * @link http://pear.php.net/bugs/bug.php?id=16758
+     *
+     * @return void
+     */
+    public function testBug16758()
+    {
+        $msg =<<<MBX
+From someone.who@loves.you
+Subject: test
+
+From now on, no more bugs!
+>From what I said...
+>>From where are you coming?
+
+MBX;
+        //file does not exist yet
+        $mbox = new Mail_Mbox(self::$filecopy);
+        $this->assertTrue($mbox->open());
+        $this->assertTrue($mbox->append($msg));
+        $mbox->close();
+
+        $mbox = new Mail_Mbox(self::$filecopy);
+        $this->assertTrue($mbox->open());
+        $this->assertEquals(1, $mbox->size());
+        $this->assertEquals($msg, $mbox->get(0));
+    }//public function testBug16758()
+
+
+
+    /**
+     * Helper method to copy $file to $filecopy
+     */
     protected function copy()
     {
         copy(Mail_MboxTest::$file, Mail_MboxTest::$filecopy);

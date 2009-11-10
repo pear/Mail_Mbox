@@ -29,11 +29,11 @@
   <active>yes</active>
 </lead>
 
- <date>2009-10-09</date>
+ <date>2009-11-10</date>
 
  <version>
-  <release>0.6.1</release>
-  <api>0.6.0</api>
+  <release>0.6.2</release>
+  <api>0.6.2</api>
  </version>
  <stability>
   <release>beta</release>
@@ -43,7 +43,7 @@
  <license uri="http://www.gnu.org/licenses/lgpl.html">LGPL</license>
 
  <notes>
-  - Fix bug #16668: Mbox doesn't work in suid/sgid scripts [vaceletm]
+  - Fix bug #16758: Messages split incorrectly
  </notes>
 
  <contents>
@@ -78,6 +78,21 @@
  <phprelease />
 
  <changelog>
+
+  <release>
+   <version>
+    <release>0.6.2</release>
+    <api>0.6.2</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2009-11-10</date>
+   <notes>
+    - Fix bug #16758: Messages split incorrectly
+   </notes>
+  </release>
 
   <release>
    <version>
