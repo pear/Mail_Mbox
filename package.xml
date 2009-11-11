@@ -29,10 +29,10 @@
   <active>yes</active>
 </lead>
 
- <date>2009-11-10</date>
+ <date>2009-11-11</date>
 
  <version>
-  <release>0.6.2</release>
+  <release>0.6.3</release>
   <api>0.6.2</api>
  </version>
  <stability>
@@ -43,7 +43,7 @@
  <license uri="http://www.gnu.org/licenses/lgpl.html">LGPL</license>
 
  <notes>
-  - Fix bug #16758: Messages split incorrectly
+  - Fix bug: "From " lines were escaped midst of text, which violates the spec
  </notes>
 
  <contents>
@@ -78,6 +78,21 @@
  <phprelease />
 
  <changelog>
+
+  <release>
+   <version>
+    <release>0.6.3</release>
+    <api>0.6.2</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2009-11-11</date>
+   <notes>
+    - Fix bug: "From " lines were escaped midst of text, which violates the spec
+   </notes>
+  </release>
 
   <release>
    <version>

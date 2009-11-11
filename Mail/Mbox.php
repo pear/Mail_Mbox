@@ -651,7 +651,7 @@ class Mail_Mbox extends PEAR
         if (substr($content, 0, 5) != 'From ') {
             return false;
         }
-        //Todo: check for two newlines?
+
         return true;
     }
 
@@ -768,10 +768,10 @@ class Mail_Mbox extends PEAR
         } else {
             $message .= "\n\n";
         }
-        return 'F' . preg_replace(
-            '/([>]*From )/',
-            '>$1',
-            substr($message, 1)
+        return preg_replace(
+            "/\n([>]*From )/",
+            "\n>$1",
+            $message
         );
     }
 
@@ -788,8 +788,9 @@ class Mail_Mbox extends PEAR
     function _unescapeMessage($message)
     {
         return preg_replace(
-            '/>([>]*From )/',
-            '$1',
+            "/\n>([>]*From )/",
+            "\n$1",
+            //the -1 drops the last newline
             substr($message, 0, -1)
         );
     }

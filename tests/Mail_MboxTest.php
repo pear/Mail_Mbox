@@ -395,6 +395,115 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->mbox->getDebug());
     }
 
+    /**
+     * Test message escaping
+     *
+     * @return void
+     */
+    public function test_escapeMessage()
+    {
+        $this->assertEquals(
+            <<<MBX
+From someone.who@loves.you
+Subject: test
+
+>From now on, no more bugs!
+>>From what I said...
+>>>From where are you coming?
+
+
+MBX
+            , $this->mbox->_escapeMessage(
+                <<<MBX
+From someone.who@loves.you
+Subject: test
+
+From now on, no more bugs!
+>From what I said...
+>>From where are you coming?
+
+MBX
+            )
+        );
+    }
+
+    /**
+     * Test message escaping with "From " midst of the text
+     *
+     * @return void
+     */
+    public function test_escapeMessageFromMid()
+    {
+        $this->assertEquals(
+            <<<MBX
+From someone.who@loves.you
+Subject: test
+
+>From now on, no more bugs!
+>>From what I said...
+>>>From where are you coming?
+>From From From From what?
+
+
+MBX
+            , $this->mbox->_escapeMessage(
+                <<<MBX
+From someone.who@loves.you
+Subject: test
+
+From now on, no more bugs!
+>From what I said...
+>>From where are you coming?
+From From From From what?
+
+MBX
+            )
+        );
+    }
+
+    /**
+     * Test message unescaping with ">From " midst of the text
+     *
+     * @return void
+     */
+    public function test_unescapeMessageFromMid()
+    {
+        $this->assertEquals(
+            <<<MBX
+From someone.who@loves.you
+Subject: test
+
+From now on, no more bugs!
+>From what I said...
+>>From where are you coming?
+From >From >From >From what?
+
+MBX
+            , $this->mbox->_unescapeMessage(
+                <<<MBX
+From someone.who@loves.you
+Subject: test
+
+>From now on, no more bugs!
+>>From what I said...
+>>>From where are you coming?
+>From >From >From >From what?
+
+
+MBX
+            )
+        );
+    }
+
+    /**
+     * Opening a non-existing mbox file does not succeed, and
+     * there was no way to create one.
+     * With bug #16487, open() accepts a $create parameter now.
+     *
+     * @link http://pear.php.net/bugs/bug.php?id=16487
+     *
+     * @return void
+     */
     public function testBug16487()
     {
         //file does not exist yet
