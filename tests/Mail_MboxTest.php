@@ -1,10 +1,4 @@
 <?php
-// Call Mail_MboxTest::main() if this source file is executed directly.
-if (!defined("PHPUnit_MAIN_METHOD")) {
-    define("PHPUnit_MAIN_METHOD", "Mail_MboxTest::main");
-}
-
-require_once 'PHPUnit/Framework.php';
 
 //make cvs testing work
 chdir(dirname(__FILE__) . '/../');
@@ -20,18 +14,6 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase
 
     protected static $file = null;
     protected static $filecopy = null;
-
-    /**
-     * Runs the test methods of this class.
-     *
-     * @access public
-     * @static
-     */
-    public static function main() {
-        require_once 'PHPUnit/TextUI/TestRunner.php';
-        $suite  = new PHPUnit_Framework_TestSuite('Mail_MboxTest');
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
-    }
 
     /**
      * Sets up the fixture, for example, open a network connection.
@@ -72,7 +54,7 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase
      */
     public function testClose() {
         $this->assertTrue($this->mbox->close());
-        $this->assertType('PEAR_Error', $this->mbox->close());
+        $this->assertInstanceOf('PEAR_Error', $this->mbox->close());
     }
 
     /**
@@ -93,7 +75,7 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase
         $this->assertContains('somebody@yandex.ru', $msg);
 
         $mbox2 = new Mail_Mbox(Mail_MboxTest::$file);
-        $this->assertType('PEAR_Error', $mbox2->get(0));
+        $this->assertInstanceOf('PEAR_Error', $mbox2->get(0));
     }
 
     /**
@@ -189,7 +171,7 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($mbox->open());
 
         $err = $mbox->insert('this is not valid', 0);
-        $this->assertType('PEAR_Error', $err);
+        $this->assertInstanceOf('PEAR_Error', $err);
         $this->assertEquals(MAIL_MBOX_ERROR_MSG_INVALID, $err->getCode());
     }
 
@@ -233,7 +215,7 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($mbox->open());
 
         $err = $mbox->append('this is invalid');
-        $this->assertType('PEAR_Error', $err);
+        $this->assertInstanceOf('PEAR_Error', $err);
         $this->assertEquals(MAIL_MBOX_ERROR_MSG_INVALID, $err->getCode());
     }
 
@@ -291,7 +273,7 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($mbox->open());
 
         $err = $mbox->update(0, 'this is invalid');
-        $this->assertType('PEAR_Error', $err);
+        $this->assertInstanceOf('PEAR_Error', $err);
         $this->assertEquals(MAIL_MBOX_ERROR_MSG_INVALID, $err->getCode());
     }
 
@@ -339,15 +321,15 @@ class Mail_MboxTest extends PHPUnit_Framework_TestCase
 
         //This methods should not allow modifying a changed file.
         $err = $mbox->remove(0);
-        $this->assertType('PEAR_Error', $err);
+        $this->assertInstanceOf('PEAR_Error', $err);
         $this->assertEquals(MAIL_MBOX_ERROR_MODIFIED, $err->getCode());
 
         $err = $mbox->insert('From Test');
-        $this->assertType('PEAR_Error', $err);
+        $this->assertInstanceOf('PEAR_Error', $err);
         $this->assertEquals(MAIL_MBOX_ERROR_MODIFIED, $err->getCode());
 
         $err = $mbox->update(0, 'From Test');
-        $this->assertType('PEAR_Error', $err);
+        $this->assertInstanceOf('PEAR_Error', $err);
         $this->assertEquals(MAIL_MBOX_ERROR_MODIFIED, $err->getCode());
 
         $this->assertTrue($mbox->close());
@@ -512,7 +494,7 @@ MBX
         $mbox = new Mail_Mbox($file);
         //open without parameter does not create anything
         $err = $mbox->open();
-        $this->assertType('PEAR_Error', $err);
+        $this->assertInstanceOf('PEAR_Error', $err);
         $this->assertEquals(
             MAIL_MBOX_ERROR_FILE_NOT_EXISTING, $err->getCode()
         );
@@ -571,9 +553,3 @@ MBX;
     }
 
 }
-
-// Call Mail_MboxTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Mail_MboxTest::main") {
-    Mail_MboxTest::main();
-}
-?>
