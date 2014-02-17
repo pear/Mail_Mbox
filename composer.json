@@ -1,0 +1,36 @@
+{
+    "authors": [
+        {
+            "email": "darkelder@php.net",
+            "name": "Roberto Berto",
+            "role": "Lead"
+        },
+        {
+            "email": "cweiske@php.net",
+            "name": "Christian Weiske",
+            "role": "Lead"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Mail_Mbox": "./"
+        }
+    },
+    "description": "More info available on: http://pear.php.net/package/Mail_Mbox",
+    "include-path": [
+        "./"
+    ],
+    "license": "LGPL",
+    "name": "pear/mail_mbox",
+    "support": {
+        "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Mail_Mbox",
+        "source": "https://github.com/pear/Mail_Mbox"
+    },
+    "type": "library",
+    "require": {
+        "pear/pear_exception": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}
